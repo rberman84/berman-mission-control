@@ -351,6 +351,13 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <p class="mini" id="routeMsg" style="margin-top:6px">Addresses never live on this page. Navigate fetches it from your PIN-protected Ops Board link when you tap.</p></div>
 </details>
 
+<!-- BUSINESS NUMBERS -->
+<details class="sec" open id="numSec">
+  <summary><span class="idx">#</span> Business numbers <span class="cnt" id="numCnt">counts only</span><span class="chev">›</span></summary>
+  <div class="body"><div class="pulse" id="nums"></div>
+  <p class="mini" style="margin-top:6px">Counts from the Ops Board, this week (Mon–Sun). No dollars on this page.</p></div>
+</details>
+
 <!-- LEAD PIPELINE -->
 <details class="sec" open id="pipeSec">
   <summary><span class="idx">⚑</span> Lead pipeline <span class="cnt" id="pipeCnt"></span><span class="chev">›</span></summary>
@@ -754,6 +761,21 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   };
   if(MC.nyParts(new Date()).weekday==='Mon') $('wkSec').open=true;
   renderWk();
+  // ---- Business numbers: counts only (never dollars), computed from Board rows ----
+  function renderNums(){
+    var rows=data().board||[], wk=weekKey(), d=new Date(wk+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()+6); var wkEnd=d.toISOString().slice(0,10);
+    var inWk=function(v){v=String(v||'').slice(0,10); return v>=wk&&v<=wkEnd;};
+    var L=rows.map(function(r){var l=MC.leadOf(r); return l;}).filter(Boolean);
+    var est=L.filter(function(l){return l.stage==='est';}).length;
+    var won=L.filter(function(l){return l.stage==='won'&&(inWk(l.raw.updated)||(!l.raw.updated&&!/done/i.test(l.raw.status)));}).length;
+    var vis=rows.map(MC.stopOf).filter(function(x){return x&&inWk(x.date);}).length;
+    var nw=L.filter(function(l){return l.stage==='new';}).length;
+    var T=[[est,'Estimates out','var(--teal)','📝'],[won,'Jobs won this week','var(--green)','🏆'],[vis,'Visits this week','var(--amber)','🚐'],[nw,'New leads to book','var(--blue)','✨']];
+    $('nums').innerHTML=T.map(function(t){return '<div class="stat"><div class="n" style="color:'+t[2]+'">'+t[0]+'</div><div class="l">'+t[3]+' '+t[1]+'</div></div>';}).join('');
+    MC.nums={est:est,won:won,vis:vis,nw:nw};
+    $('numCnt').textContent='counts only · '+(MC.last?'live':'snapshot');
+  }
+  MC.on(renderNums); renderNums();
 })();
 </script>
 </body>
