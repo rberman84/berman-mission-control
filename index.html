@@ -187,6 +187,12 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 .stop .who{flex:1;min-width:0}.stop .who b{display:block}.stop .who span{font-size:12.5px;color:var(--dim)}
 .stop .nav{flex:none;padding:10px 12px;border-radius:10px;border:1px solid rgba(46,230,200,.45);background:rgba(46,230,200,.1);color:var(--teal);font-weight:700;cursor:pointer;font-size:14px}
 .dayh{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin:6px 0 0}
+/* Weekly reset */
+.wk label{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;margin:0 0 6px;background:var(--panel2);cursor:pointer;font-size:14.5px}
+.wk input[type=checkbox]{width:22px;height:22px;accent-color:var(--teal);flex:none}
+.wk label.on{border-color:rgba(94,240,143,.45);color:var(--green)}
+.wk .pick{width:100%;box-sizing:border-box;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin:4px 0}
+.wkbar{height:8px;border-radius:99px;background:var(--grey-d);overflow:hidden;margin:4px 0 10px}.wkbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
 </style>
 </head>
 <body>
@@ -326,6 +332,16 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
       <p>Marketeer's read: about <b style="color:var(--text)">27–31</b> reviews today vs. a <b style="color:var(--text)">150–400</b> benchmark. 64 past customers are ready for requests once the link and text are approved.</p>
     </div>
   </div>
+</details>
+
+<!-- WEEKLY RESET -->
+<details class="sec" id="wkSec">
+  <summary><span class="idx">↻</span> Weekly reset <span class="cnt" id="wkCnt"></span><span class="chev">›</span></summary>
+  <div class="body wk"><div class="wkbar"><i id="wkBar" style="width:0"></i></div><div id="wkList"></div>
+    <div class="dayh" style="margin:10px 0 4px">Top 3 for the week</div>
+    <input class="pick" id="wkP1" maxlength="120" placeholder="1. Biggest needle-mover"><input class="pick" id="wkP2" maxlength="120" placeholder="2."><input class="pick" id="wkP3" maxlength="120" placeholder="3.">
+    <div class="askrow"><button class="tick" id="wkSave">➤ Lock in the week</button> <span class="mini" id="wkMsg"></span></div>
+    <p class="mini">Keep picks short and first names only. Saved to the Ops Board Inbox for Head Honcho.</p></div>
 </details>
 
 <!-- ROUTE -->
@@ -709,6 +725,35 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
       .catch(function(err){ b.textContent='🧭 Go'; fallback(/unknown action/.test(err.message)?'Exact address needs the script update.':'('+err.message+')'); });
   });
   MC.on(renderRoute); renderRoute(); setInterval(renderRoute,5*60000);
+  // ---- Weekly reset (Monday checklist + top 3, saved via the existing 'ask' action) ----
+  var WK='bermanMC.week.v1', STEPS=[['review','Review last week (wins + misses)'],['wait','Clear Waiting on Rob'],['top3','Pick the top 3 for the week'],['bots','Check bot reports']];
+  function weekKey(){var p=MC.nyParts(new Date()), d=new Date(Date.UTC(+p.year,+p.month-1,+p.day)), dow=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-dow); return d.toISOString().slice(0,10);}
+  MC.weekKey=weekKey;
+  function getWk(){try{var o=JSON.parse(localStorage.getItem(WK))||{}; return o.week===weekKey()?o:{week:weekKey(),c:{},p:['','','']};}catch(e){return {week:weekKey(),c:{},p:['','','']};}}
+  function setWk(o){try{localStorage.setItem(WK,JSON.stringify(o));}catch(e){}}
+  function renderWk(){
+    var o=getWk(), n=0;
+    $('wkList').innerHTML=STEPS.map(function(x){var on=!!o.c[x[0]]; if(on)n++; return '<label class="'+(on?'on':'')+'"><input type="checkbox" data-k="'+x[0]+'"'+(on?' checked':'')+'> '+esc(x[1])+(on?' ✓':'')+'</label>';}).join('');
+    [0,1,2].forEach(function(i){var el=$('wkP'+(i+1)); if(document.activeElement!==el) el.value=o.p[i]||'';});
+    $('wkBar').style.width=(n/STEPS.length*100)+'%';
+    var mon=MC.nyParts(new Date()).weekday==='Mon';
+    $('wkCnt').textContent=(n===STEPS.length?'Week locked 🔒':n+'/'+STEPS.length)+(mon?' · it\'s Monday':' · Mondays');
+    if(o.saved) $('wkMsg').textContent='Saved ✓ '+o.saved;
+  }
+  $('wkList').addEventListener('change',function(e){var k=e.target.dataset.k; if(!k) return; var o=getWk(); o.c[k]=e.target.checked; setWk(o); renderWk();});
+  [1,2,3].forEach(function(i){$('wkP'+i).addEventListener('input',function(){var o=getWk(); o.p[i-1]=this.value; if(o.p.filter(function(v){return v.trim();}).length===3) o.c.top3=true; setWk(o); renderWk();});});
+  $('wkSave').onclick=function(){
+    var o=getWk(), picks=o.p.map(function(v){return v.trim();}).filter(Boolean);
+    if(!picks.length){ $('wkMsg').textContent='Add at least one pick first.'; return; }
+    if(!MC.conn()){ $('wkMsg').textContent='Saved on this phone. Tap Connect to send to the board.'; return; }
+    $('wkMsg').textContent='Saving…';
+    var done=STEPS.filter(function(x){return o.c[x[0]];}).map(function(x){return x[1];});
+    MC.api({action:'ask',bot:'Head Honcho',question:'[Weekly reset · week of '+o.week+'] Top 3: '+picks.map(function(v,i){return (i+1)+') '+v;}).join(' ')+' · Checklist done: '+(done.join(', ')||'none')})
+      .then(function(){var o2=getWk(); var p=MC.nyParts(new Date()); o2.saved=p.weekday+' '+(+p.hour%12||12)+':'+p.minute; setWk(o2); renderWk(); MC.refreshSoon();})
+      .catch(function(e){ $('wkMsg').textContent='Not saved: '+e.message; });
+  };
+  if(MC.nyParts(new Date()).weekday==='Mon') $('wkSec').open=true;
+  renderWk();
 })();
 </script>
 </body>
