@@ -196,7 +196,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <div class="ring"><svg width="118" height="118"><circle cx="59" cy="59" r="50" stroke="#1d2a33" stroke-width="12" fill="none"/>
   <circle class="fg" id="scoreArc" cx="59" cy="59" r="50" stroke="#2ee6c8" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/></svg>
   <div class="num"><b id="scoreNum">0</b><small>DAILY SCORE</small></div></div>
-  <div><h2 id="scoreTitle">How organized is today?</h2><div class="hint" id="scoreHint"></div><div class="mix" id="scoreMix"></div></div>
+  <div><h2 id="scoreTitle">How organized is today?</h2><div class="hint" id="scoreHint"></div><div class="mix" id="scoreMix"></div><div class="mix" id="liveTag" style="margin-top:4px">● Offline snapshot</div></div>
 </div>
 
 <details class="sec" open id="apprSec">
@@ -207,7 +207,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 
 <div class="gauges">
   <div class="gauge a"><div class="n" id="gWait">0</div><div class="l">Waiting on Rob</div></div>
-  <div class="gauge r"><div class="n">3</div><div class="l">Blocked items</div></div>
+  <div class="gauge r"><div class="n" id="gBlock">3</div><div class="l">Blocked items</div></div>
   <div class="gauge t"><div class="n">5</div><div class="l">Leads need visits</div></div>
   <div class="gauge b"><div class="n">2</div><div class="l">On deck Thu Oct 15</div></div>
 </div>
@@ -399,7 +399,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u)){ $('suMsg').textContent='That URL should start with https://script.google.com/macros/s/ and end with /exec'; return;}
     if(!p){ $('suMsg').textContent='Enter your PIN.'; return;}
     localStorage.setItem(CK,JSON.stringify({url:u,pin:p})); $('suMsg').textContent='Testing…';
-    api({action:'ping'}).then(function(){ $('suMsg').textContent='Connected ✓'; showConn(); setTimeout(function(){$('setup').hidden=true;},800);})
+    api({action:'ping'}).then(function(){ $('suMsg').textContent='Connected ✓'; showConn(); refresh(); setTimeout(function(){$('setup').hidden=true;},800);})
       .catch(function(e){ localStorage.removeItem(CK); showConn(); $('suMsg').textContent='Could not connect: '+e.message;});};
   $('waitGrid').addEventListener('click',function(e){
     var btn=e.target.closest('.tick'); if(!btn) return;
@@ -407,13 +407,13 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     var t=getTicks(), undo=!!t[id]; t[id]=!undo; setTicks(t); renderWaiting();
     if(!conn()) return;
     var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b) b.textContent='… saving';
-    api({action:'done',item:w.item,undo:undo}).then(function(){var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b){b.textContent=(undo?'✓ Mark done':'✓ Done on board'); b.classList.add('sync');}})
+    api({action:'done',item:w.item,row:w.row,undo:undo}).then(function(){refreshSoon();var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b){b.textContent=(undo?'✓ Mark done':'✓ Done on board'); b.classList.add('sync');}})
       .catch(function(err){var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b){b.textContent='⚠ Not saved, tap to retry'; b.classList.add('err');} var t=getTicks(); t[id]=undo; setTicks(t);});
   });
   $('askSend').onclick=function(){var q=$('askQ').value.trim(); if(!q) return;
     if(!conn()){ $('askMsg').textContent='Not connected yet. Tap Connect above.'; return;}
     $('askMsg').textContent='Sending…';
-    api({action:'ask',question:q,bot:$('askBot').value}).then(function(){ $('askQ').value=''; $('askMsg').textContent='Sent ✓ Head Honcho will reply in chat.';})
+    api({action:'ask',question:q,bot:$('askBot').value}).then(function(){ refreshSoon(); $('askQ').value=''; $('askMsg').textContent='Sent ✓ Head Honcho will reply in chat.';})
       .catch(function(e){ $('askMsg').textContent='Not sent: '+e.message;});};
 
   // ---- Board snapshot (statuses from Ops Board, Oct 14) for the Daily Score ----
@@ -424,6 +424,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     approvals.forEach(function(x){ if(a[x.id] && x.boardWait){ b.done++; b.wait--; } if(a[x.id]) today++; });
     var tot=b.done+b.prog+b.wait+b.block+b.not;
     var base=(b.done+0.5*b.prog+0.25*b.not)/tot*100;
+    if(typeof SNAP_TODAY==='number') today+=SNAP_TODAY;
     var sc=Math.min(100,Math.round(base+5*today));
     return {sc:sc,b:b,today:today,tot:tot};
   }
@@ -474,7 +475,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     var x=approvals.filter(function(y){return y.id===id;})[0], a=getAppr(); a[id]=status; setAppr(a); renderAppr();
     var el=$('st'+id); if(!conn()){ if(el) el.textContent+=' (saved on this phone; tap Connect to sync)'; return; }
     if(el) el.textContent+=' · saving…';
-    sendAppr(x,status,note).then(function(){var el=$('st'+id); if(el) el.innerHTML=el.innerHTML.replace(' · saving…',' · on board ✓');})
+    sendAppr(x,status,note).then(function(){refreshSoon();var el=$('st'+id); if(el) el.innerHTML=el.innerHTML.replace(' · saving…',' · on board ✓');})
       .catch(function(e){var a=getAppr(); delete a[id]; setAppr(a); renderAppr(); var el=$('st'+id); if(el) el.textContent='⚠ Not saved: '+e.message;});
   }
   $('apprGrid').addEventListener('click',function(e){var t=e.target, d=t.dataset;
@@ -486,6 +487,37 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   showConn();
   document.getElementById('resetTicks').addEventListener('click',function(){setTicks({});renderWaiting();});
   window.__mcReady=1; renderWaiting(); renderAppr();
+
+  // ---- Live mode: read the Ops Board via the 'state' action. Falls back to the baked-in snapshot above. ----
+  var SNAP_TODAY=null, liveOn=false, busy=false;
+  function setTag(t,ok){var e=$('liveTag'); e.textContent=t; e.style.color=ok?'#5ef08f':'';}
+  function stKey(x){x=String(x||'').toLowerCase(); return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
+  function nyYmd(){var p=nyParts(new Date()); return p.year+'-'+p.month+'-'+p.day;}
+  function applyState(j){
+    var rows=(j.board||[]).filter(function(r){return r.item;});
+    var nb={done:0,prog:0,wait:0,block:0,not:0}, today=0, ymd=nyYmd();
+    rows.forEach(function(r){var k=stKey(r.status); nb[k]++; if(k==='done' && String(r.updated).indexOf(ymd)===0) today++;});
+    var w=rows.filter(function(r){return stKey(r.status)==='wait' && !/^APPROVAL /.test(r.item);}).map(function(r){
+      return {id:'r'+r.row, row:r.row, item:r.item, t:r.item, d:r.next||'', who:(r.owner||'')+(r.due?' · due '+r.due:''), s:'wait'};});
+    waiting.length=0; Array.prototype.push.apply(waiting,w);
+    board=nb; SNAP_TODAY=today;
+    approvals.length=0; var a={};
+    (j.approvals||[]).forEach(function(x){approvals.push({id:x.id,type:x.type||'',title:x.title||x.id,who:'Head Honcho',draft:x.draft||'',note:x.note?('Your note: '+x.note):''}); if(x.status==='Changes') a[x.id]='Changes';});
+    setTicks({}); setAppr(a); liveOn=true;
+    $('gBlock').textContent=nb.block;
+    renderWaiting(); renderAppr();
+    var p=nyParts(new Date()), h=+p.hour, ap=h>=12?'PM':'AM'; h=h%12||12;
+    setTag('● Live, updated '+h+':'+p.minute+' '+ap, true);
+  }
+  function refresh(){
+    if(!conn()){ setTag('● Offline snapshot'); return Promise.resolve(); }
+    if(busy) return Promise.resolve(); busy=true;
+    return api({action:'state'}).then(applyState).catch(function(){ setTag(liveOn?'● Offline, showing last update':'● Offline snapshot'); })
+      .then(function(){busy=false;});
+  }
+  var rt=null; function refreshSoon(){clearTimeout(rt); rt=setTimeout(refresh,1500);}
+  refresh(); setInterval(function(){ if(!document.hidden) refresh(); },60000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) refresh(); });
 
   // ---- Crew ----
   var crew = [
