@@ -167,6 +167,18 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 .appr .acts button.ed{border-color:rgba(255,181,71,.45);background:rgba(255,181,71,.08);color:var(--amber)}
 .appr textarea{width:100%;min-height:70px;margin-top:8px;border-radius:8px;background:#0b141b;color:var(--text);border:1px solid #2a3a46;padding:8px;font-size:15px}
 .appr .st{font-family:var(--mono);font-size:12px;margin-top:6px;color:var(--dim)}
+/* Lead pipeline */
+.kan{display:grid;grid-template-columns:repeat(4,minmax(200px,1fr));gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}
+.kcol{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:8px;scroll-snap-align:start;min-height:80px}
+.kcol h4{margin:0 0 6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between}
+.kcol h4 b{color:var(--text)}
+.lead{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;padding:9px 10px;margin:0 0 6px;color:var(--text);font:inherit;cursor:pointer;display:block}
+.lead .nm{font-weight:700}.lead .sb{font-size:12px;color:var(--dim)}
+.lead .nx{display:none;margin-top:6px;font-size:13px;color:var(--amber)}.lead.open .nx{display:block}
+.lead.open{box-shadow:0 0 14px rgba(46,230,200,.18);border-color:rgba(46,230,200,.5)}
+.kcol.c-new h4{color:var(--blue)}.kcol.c-visit h4{color:var(--amber)}.kcol.c-est h4{color:var(--teal)}.kcol.c-won h4{color:var(--green)}
+.c-new .lead{border-left-color:var(--blue)}.c-visit .lead{border-left-color:var(--amber)}.c-won .lead{border-left-color:var(--green)}.lead.lost{opacity:.55;border-left-color:var(--grey)}
+.kempty{font-size:12px;color:var(--dim);padding:6px}
 </style>
 </head>
 <body>
@@ -306,6 +318,13 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
       <p>Marketeer's read: about <b style="color:var(--text)">27–31</b> reviews today vs. a <b style="color:var(--text)">150–400</b> benchmark. 64 past customers are ready for requests once the link and text are approved.</p>
     </div>
   </div>
+</details>
+
+<!-- LEAD PIPELINE -->
+<details class="sec" open id="pipeSec">
+  <summary><span class="idx">⚑</span> Lead pipeline <span class="cnt" id="pipeCnt"></span><span class="chev">›</span></summary>
+  <div class="body"><div class="kan" id="kan"></div>
+  <p class="mini" style="margin-top:6px">Tap a lead to see its next move. Built from the Ops Board.</p></div>
 </details>
 
 <!-- 6. RHYTHM -->
@@ -504,6 +523,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     approvals.length=0; var a={};
     (j.approvals||[]).forEach(function(x){approvals.push({id:x.id,type:x.type||'',title:x.title||x.id,who:'Head Honcho',draft:x.draft||'',note:x.note?('Your note: '+x.note):''}); if(x.status==='Changes') a[x.id]='Changes';});
     setTicks({}); setAppr(a); liveOn=true;
+    if(window.MC) MC.emit(j);
     $('gBlock').textContent=nb.block;
     renderWaiting(); renderAppr();
     var p=nyParts(new Date()), h=+p.hour, ap=h>=12?'PM':'AM'; h=h%12||12;
@@ -581,6 +601,56 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     }
   }
   tick(); setInterval(tick,1000);
+  window.MC={api:api,conn:conn,esc:esc,nyParts:nyParts,$:$,refreshSoon:function(){refreshSoon();},subs:[],last:null,
+    on:function(fn){this.subs.push(fn); if(this.last) fn(this.last);},emit:function(j){this.last=j; this.subs.forEach(function(fn){try{fn(j);}catch(e){console.error(e);}});}};
+})();
+</script>
+<script id="mcx">
+(function(){
+  var MC=window.MC; if(!MC) return; var esc=MC.esc, $=MC.$;
+  // Offline snapshot of Board rows (first names only, no addresses/phones/money), same shape as the live 'state' action.
+  var SNAP={board:[
+    {row:2,item:'Timothy estimate follow-up (overdue)',area:'Estimating',owner:'Head Honcho',status:'Waiting on Rob',next:'Rob OKs a check-in text draft',due:'',updated:''},
+    {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Rob confirmed 2 PM; fix time in Copilot app',due:'2026-10-15',updated:'2026-10-14'},
+    {row:4,item:'Schedule estimate visit: Mike (kitchen switch, Centereach)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:'2026-10-14'},
+    {row:5,item:'Schedule estimate visit: Luann (Ring doorbell + camera, Syosset)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
+    {row:6,item:'Phil (Wading River) won: convert to job',area:'Jobs',owner:'Head Honcho',status:'Not started',next:'Set up job in app (lighting)',due:'',updated:''},
+    {row:7,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Visit; send notes after for draft estimate',due:'2026-10-15',updated:''}
+  ]};
+  MC.snap=SNAP;
+  function data(){return MC.last||SNAP;}
+  MC.data=data;
+  // ---- Lead classification from Board rows ----
+  function leadOf(r){
+    var it=String(r.item||''), low=it.toLowerCase(), st=String(r.status||'').toLowerCase(), done=/done/.test(st);
+    var stage=null;
+    if(/\blost\b/.test(low)) stage='lost';
+    else if(/\bwon\b/.test(low)) stage='won';
+    else if(/estimate (follow|sent|out)|follow-up on estimate|estimate.*(check-in|followup)/.test(low)) stage='est';
+    else if(/schedule (an )?(estimate )?visit|new lead|lead:/.test(low)) stage='new';
+    else if(/(estimate|site) visit|walkthrough|walk-through/.test(low)) stage='visit';
+    if(!stage) return null;
+    if(done && stage!=='won' && stage!=='lost') return null;
+    var nm=it.replace(/^(schedule (an )?(estimate )?visit|new lead|lead)\s*:\s*/i,'').split(/[\s(,:]/)[0];
+    var sub=(it.match(/\(([^)]*)\)/)||[])[1]||it.replace(/^.*?:\s*/,'').replace(nm,'').trim();
+    return {stage:stage,name:nm,sub:sub,next:r.next||'(no next action on the board yet)',owner:r.owner||'',due:r.due||'',row:r.row,raw:r};
+  }
+  MC.leadOf=leadOf;
+  var COLS=[['new','New','c-new'],['visit','Visit','c-visit'],['est','Estimate','c-est'],['won','Won / Lost','c-won']];
+  var openRow=null;
+  function renderPipe(){
+    var L=(data().board||[]).map(leadOf).filter(Boolean), n=0;
+    $('kan').innerHTML=COLS.map(function(c){
+      var xs=L.filter(function(l){return l.stage===c[0]||(c[0]==='won'&&l.stage==='lost');}); n+=xs.length;
+      return '<div class="kcol '+c[2]+'"><h4>'+c[1]+' <b>'+xs.length+'</b></h4>'+(xs.length?xs.map(function(l){
+        return '<button class="lead'+(l.stage==='lost'?' lost':'')+(openRow===l.row?' open':'')+'" data-row="'+l.row+'"><div class="nm">'+esc(l.name)+(l.stage==='lost'?' · lost':l.stage==='won'?' 🏆':'')+'</div>'+
+          '<div class="sb">'+esc(l.sub)+'</div><div class="nx">▶ Next: '+esc(l.next)+(l.owner?' <span class="sb">· '+esc(l.owner)+'</span>':'')+(l.due?' <span class="sb">· due '+esc(l.due)+'</span>':'')+'</div></button>';
+      }).join(''):'<div class="kempty">Nothing here yet</div>')+'</div>';
+    }).join('');
+    $('pipeCnt').textContent=n+' lead'+(n===1?'':'s')+(MC.last?' · live':' · snapshot');
+  }
+  $('kan').addEventListener('click',function(e){var b=e.target.closest('.lead'); if(!b) return; var r=+b.dataset.row; openRow=(openRow===r?null:r); renderPipe();});
+  MC.on(renderPipe); renderPipe();
 })();
 </script>
 </body>
