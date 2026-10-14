@@ -193,6 +193,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 .wk label.on{border-color:rgba(94,240,143,.45);color:var(--green)}
 .wk .pick{width:100%;box-sizing:border-box;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin:4px 0}
 .wkbar{height:8px;border-radius:99px;background:var(--grey-d);overflow:hidden;margin:4px 0 10px}.wkbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
+#askMic.rec{color:var(--red);border-color:rgba(255,93,108,.6);animation:pulse 1.2s infinite}
 </style>
 </head>
 <body>
@@ -295,7 +296,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <div class="body"><div class="card">
     <div class="askrow"><select id="askBot"><option>Head Honcho</option><option>Marketeer</option><option>Money Man</option><option>SEO &amp; AEO Desk</option><option>Video Creation Expert</option></select></div>
     <textarea id="askQ" rows="3" placeholder="Type a question or task. Head Honcho picks it up and routes it."></textarea>
-    <div class="askrow"><button class="tick" id="askSend">➤ Send to crew</button> <span class="mini" id="askMsg"></span></div>
+    <div class="askrow"><button class="tick" id="askSend">➤ Send to crew</button> <button class="tick" id="askMic" aria-label="Speak your question">🎤 Talk</button> <span class="mini" id="askMsg"></span></div>
   </div></div>
 </details>
 <div class="modal" id="setup" hidden><div class="card">
@@ -776,6 +777,21 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     $('numCnt').textContent='counts only · '+(MC.last?'live':'snapshot');
   }
   MC.on(renderNums); renderNums();
+  // ---- Voice ask (Web Speech API, with keyboard-dictation fallback) ----
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null, recOn=false;
+  var FALLBACK='Voice isn\'t available in this browser. On iPhone, tap the 🎤 mic on your keyboard to dictate instead.';
+  function micMsg(t){ $('askMsg').textContent=t; }
+  $('askMic').onclick=function(){
+    var q=$('askQ');
+    if(!SR){ micMsg(FALLBACK); q.focus(); return; }
+    if(recOn){ try{rec.stop();}catch(e){} return; }
+    var base=q.value.trim(); rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
+    rec.onstart=function(){recOn=true; $('askMic').classList.add('rec'); $('askMic').textContent='■ Stop'; micMsg('Listening… talk now.');};
+    rec.onresult=function(e){var t=''; for(var i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; q.value=(base?base+' ':'')+t;};
+    rec.onerror=function(e){ micMsg(/not-allowed|service-not-allowed/.test(e.error)?'Mic blocked. Allow it in settings, or use the 🎤 on your keyboard.':e.error==='no-speech'?'Didn\'t catch that. Tap 🎤 and try again.':FALLBACK); };
+    rec.onend=function(){recOn=false; $('askMic').classList.remove('rec'); $('askMic').textContent='🎤 Talk'; if(/Listening/.test($('askMsg').textContent)) micMsg(q.value.trim()?'Got it. Check it, then tap Send.':'');};
+    try{ rec.start(); }catch(e){ micMsg(FALLBACK); }
+  };
 })();
 </script>
 </body>
