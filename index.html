@@ -179,6 +179,14 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 .kcol.c-new h4{color:var(--blue)}.kcol.c-visit h4{color:var(--amber)}.kcol.c-est h4{color:var(--teal)}.kcol.c-won h4{color:var(--green)}
 .c-new .lead{border-left-color:var(--blue)}.c-visit .lead{border-left-color:var(--amber)}.c-won .lead{border-left-color:var(--green)}.lead.lost{opacity:.55;border-left-color:var(--grey)}
 .kempty{font-size:12px;color:var(--dim);padding:6px}
+/* Route */
+.route{display:grid;gap:8px}
+.stop{display:flex;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.stop .tm{font-family:var(--mono);color:var(--amber);font-size:17px;min-width:64px;text-align:center}
+.stop .tm small{display:block;font-size:10px;color:var(--dim);letter-spacing:.08em}
+.stop .who{flex:1;min-width:0}.stop .who b{display:block}.stop .who span{font-size:12.5px;color:var(--dim)}
+.stop .nav{flex:none;padding:10px 12px;border-radius:10px;border:1px solid rgba(46,230,200,.45);background:rgba(46,230,200,.1);color:var(--teal);font-weight:700;cursor:pointer;font-size:14px}
+.dayh{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -318,6 +326,13 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
       <p>Marketeer's read: about <b style="color:var(--text)">27–31</b> reviews today vs. a <b style="color:var(--text)">150–400</b> benchmark. 64 past customers are ready for requests once the link and text are approved.</p>
     </div>
   </div>
+</details>
+
+<!-- ROUTE -->
+<details class="sec" open id="routeSec">
+  <summary><span class="idx">➜</span> Today's route <span class="cnt" id="routeCnt"></span><span class="chev">›</span></summary>
+  <div class="body"><div class="route" id="route"></div>
+  <p class="mini" id="routeMsg" style="margin-top:6px">Addresses never live on this page. Navigate fetches it from your PIN-protected Ops Board link when you tap.</p></div>
 </details>
 
 <!-- LEAD PIPELINE -->
@@ -651,6 +666,49 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   }
   $('kan').addEventListener('click',function(e){var b=e.target.closest('.lead'); if(!b) return; var r=+b.dataset.row; openRow=(openRow===r?null:r); renderPipe();});
   MC.on(renderPipe); renderPipe();
+  // ---- Today's route: today's + tomorrow's visits/jobs in time order. Town only; address fetched on tap. ----
+  var TOWNS=['Ronkonkoma','Islandia','Setauket','East Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset','Lake Ronkonkoma'];
+  var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  function ymdNY(d){var p=MC.nyParts(d); return p.year+'-'+p.month+'-'+p.day;}
+  function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;}); return best;}
+  function stopOf(r){
+    var t=String(r.item||'')+' '+String(r.next||''), low=t.toLowerCase();
+    if(!/visit|job|appointment|install|service call|walkthrough/.test(low)) return null;
+    if(/^schedule /i.test(r.item)) return null;
+    var tm=t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i); if(!tm) return null;
+    var date=/^\d{4}-\d{2}-\d{2}/.test(r.due)?r.due.slice(0,10):'';
+    var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
+    if(!date&&dm){date=MC.nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');}
+    if(!date) return null;
+    var h=+tm[1]%12+(/pm/i.test(tm[3])?12:0), m=+(tm[2]||0);
+    var nm=String(r.item).split(/[\s(,:]/)[0], kind=/estimate/.test(low)?'Estimate visit':/job|install/.test(low)?'Job':'Visit';
+    var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|switch|outlet)/i)||[])[1]||'';
+    return {row:r.row,item:r.item,name:nm,date:date,mins:h*60+m,time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():'')};
+  }
+  MC.stopOf=stopOf;
+  function renderRoute(){
+    var now=new Date(), td=ymdNY(now), tm=ymdNY(new Date(now.getTime()+864e5));
+    var S=(data().board||[]).map(stopOf).filter(function(x){return x&&(x.date===td||x.date===tm);}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;});
+    MC.stops=S; var html='';
+    [[td,'Today'],[tm,'Tomorrow']].forEach(function(d){
+      var xs=S.filter(function(x){return x.date===d[0];});
+      html+='<div class="dayh">'+d[1]+' · '+xs.length+' stop'+(xs.length===1?'':'s')+'</div>';
+      html+=xs.length?xs.map(function(x,i){return '<div class="stop"><div class="tm">'+esc(x.time)+'<small>#'+(i+1)+'</small></div><div class="who"><b>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
+        '<button class="nav" data-row="'+x.row+'">🧭 Go</button></div>';}).join(''):'<div class="kempty">Open road. Nothing booked'+(d[1]==='Today'?' today.':' tomorrow.')+'</div>';
+    });
+    $('route').innerHTML=html; $('routeCnt').textContent=S.length+' stop'+(S.length===1?'':'s');
+  }
+  function go(url){ MC.lastNav=url; try{ window.location.href=url; }catch(e){} }
+  $('route').addEventListener('click',function(e){
+    var b=e.target.closest('.nav'); if(!b) return; var x=(MC.stops||[]).filter(function(s){return s.row===+b.dataset.row;})[0]; if(!x) return;
+    var fallback=function(why){ $('routeMsg').textContent=(x.town?'Opening Maps to '+x.town+' (town only). ':'No town on the board for this stop. ')+why;
+      go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY')); };
+    if(!MC.conn()) return fallback('Connect your Ops Board link to get the exact address.');
+    b.textContent='… locating';
+    MC.api({action:'address',row:x.row,item:x.item}).then(function(j){ b.textContent='🧭 Go'; $('routeMsg').textContent='Opening Maps…'; go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address)); })
+      .catch(function(err){ b.textContent='🧭 Go'; fallback(/unknown action/.test(err.message)?'Exact address needs the script update.':'('+err.message+')'); });
+  });
+  MC.on(renderRoute); renderRoute(); setInterval(renderRoute,5*60000);
 })();
 </script>
 </body>
