@@ -457,7 +457,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
       var st=a[x.id]; if(!st) open++;
       html+='<div class="card appr'+(st?' done-local':'')+'" data-id="'+x.id+'"><div class="row"><h3>'+esc(x.title)+'</h3><span class="chip '+(st==='Approved'?'s-done':st==='Changes'?'s-wait':'s-prog')+'">'+(st||'Pending')+'</span></div>'+
         '<div class="meta">'+esc(x.type)+' · '+esc(x.who)+'</div><pre>'+esc(x.draft)+'</pre><p>'+esc(x.note)+'</p>'+
-        (st?'<div class="st" id="st'+x.id+'">'+(st==='Approved'?'✓ Approved':'✎ Changes sent')+' · <button class="mini-undo" data-undo="'+x.id+'" style="background:none;border:none;color:var(--teal);text-decoration:underline;cursor:pointer">undo</button></div>':
+        (st?'<div class="st" id="st'+x.id+'">'+(st==='Approved'?(/text/i.test(x.type+' '+x.title)?'✓ Approved. Head Honcho will get it ready for you to send.':'✓ Approved'):'✎ Changes sent')+' · <button class="mini-undo" data-undo="'+x.id+'" style="background:none;border:none;color:var(--teal);text-decoration:underline;cursor:pointer">undo</button></div>':
         '<div class="acts"><button class="ok" data-ok="'+x.id+'">✓ Approve</button><button class="ed" data-ed="'+x.id+'">✎ Edit</button></div>'+
         '<div hidden id="box'+x.id+'"><textarea id="note'+x.id+'" placeholder="What should change?"></textarea><div class="acts" style="margin-top:6px"><button class="ed" data-send="'+x.id+'">Send changes</button></div></div><div class="st" id="st'+x.id+'"></div>')+'</div>';
     });
