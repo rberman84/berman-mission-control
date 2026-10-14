@@ -156,6 +156,17 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .modal[hidden]{display:none}.modal .card{max-width:420px;width:100%}
 .tick.sync{color:var(--teal);border-color:rgba(46,230,200,.4)}.tick.err{color:var(--red)}
+.score{display:flex;align-items:center;gap:16px;margin:12px 0;padding:14px;border-radius:14px;border:1px solid rgba(46,230,200,.3);background:rgba(46,230,200,.05)}
+.ring{position:relative;width:118px;height:118px;flex:none}.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
+.ring .num b{font-size:34px;line-height:1}.ring .num small{font-size:10px;color:var(--dim);letter-spacing:.1em}
+.ring circle.fg{transition:stroke-dashoffset .8s ease,stroke .5s}
+.score h2{margin:0;font-size:16px}.score .hint{margin-top:6px;font-size:14px}.score .mix{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.card.appr{border-left:3px solid var(--blue)}.appr pre{white-space:pre-wrap;font-family:inherit;font-size:14px;background:rgba(255,255,255,.04);padding:10px;border-radius:8px;margin:8px 0}
+.appr .acts{display:flex;gap:8px;flex-wrap:wrap}.appr .acts button{flex:1 1 120px;padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;border:1px solid rgba(46,230,200,.4);background:rgba(46,230,200,.1);color:var(--teal)}
+.appr .acts button.ed{border-color:rgba(255,181,71,.45);background:rgba(255,181,71,.08);color:var(--amber)}
+.appr textarea{width:100%;min-height:70px;margin-top:8px;border-radius:8px;background:#0b141b;color:var(--text);border:1px solid #2a3a46;padding:8px;font-size:15px}
+.appr .st{font-family:var(--mono);font-size:12px;margin-top:6px;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -180,6 +191,19 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <div id="bannerText">Checking systems…</div>
   <div class="sub" id="bannerSub"></div>
 </div>
+
+<div class="score" id="scoreBox">
+  <div class="ring"><svg width="118" height="118"><circle cx="59" cy="59" r="50" stroke="#1d2a33" stroke-width="12" fill="none"/>
+  <circle class="fg" id="scoreArc" cx="59" cy="59" r="50" stroke="#2ee6c8" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/></svg>
+  <div class="num"><b id="scoreNum">0</b><small>DAILY SCORE</small></div></div>
+  <div><h2 id="scoreTitle">How organized is today?</h2><div class="hint" id="scoreHint"></div><div class="mix" id="scoreMix"></div></div>
+</div>
+
+<details class="sec" open id="apprSec">
+  <summary><span class="idx">✓</span> Approvals <span class="cnt" id="apprCnt"></span><span class="chev">›</span></summary>
+  <div class="body"><div class="grid" id="apprGrid"></div>
+  <p class="meta" style="margin-top:8px">Approving here only marks it OK on the board. Nothing goes to a customer until Head Honcho sends it with your OK.</p></div>
+</details>
 
 <div class="gauges">
   <div class="gauge a"><div class="n" id="gWait">0</div><div class="l">Waiting on Rob</div></div>
@@ -345,7 +369,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     });
     document.getElementById('waitGrid').innerHTML=html;
     document.getElementById('waitCnt').textContent=open+' of '+waiting.length+' open';
-    document.getElementById('gWait').textContent=open;
+    document.getElementById('gWait').textContent=open; if(typeof renderScore==='function'&&window.__mcReady) renderScore();
     var b=document.getElementById('banner');
     if(open>0){
       b.className='banner needs';
@@ -391,9 +415,77 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     $('askMsg').textContent='Sending…';
     api({action:'ask',question:q,bot:$('askBot').value}).then(function(){ $('askQ').value=''; $('askMsg').textContent='Sent ✓ Head Honcho will reply in chat.';})
       .catch(function(e){ $('askMsg').textContent='Not sent: '+e.message;});};
+
+  // ---- Board snapshot (statuses from Ops Board, Oct 14) for the Daily Score ----
+  var board={done:4,prog:0,wait:8,block:3,not:8};
+  function scoreState(){
+    var t=getTicks(), a=getAppr(), b={done:board.done,prog:board.prog,wait:board.wait,block:board.block,not:board.not}, today=0;
+    waiting.forEach(function(w){ if(t[w.id]){ b.done++; if(w.s==='wait') b.wait--; else b.not--; today++; }});
+    approvals.forEach(function(x){ if(a[x.id] && x.boardWait){ b.done++; b.wait--; } if(a[x.id]) today++; });
+    var tot=b.done+b.prog+b.wait+b.block+b.not;
+    var base=(b.done+0.5*b.prog+0.25*b.not)/tot*100;
+    var sc=Math.min(100,Math.round(base+5*today));
+    return {sc:sc,b:b,today:today,tot:tot};
+  }
+  function renderScore(){
+    var st=scoreState(), sc=st.sc, col=sc>=80?'#5ef08f':sc>=50?'#2ee6c8':'#ffb547';
+    var arc=$('scoreArc'); arc.style.strokeDashoffset=(314.16*(1-sc/100)).toFixed(1); arc.style.stroke=col;
+    $('scoreNum').textContent=sc; $('scoreNum').style.color=col;
+    // how many more closes to hit next milestone (each close ≈ 100/tot + 5)
+    var goal=sc<50?50:sc<80?80:100, per=100/st.tot+5, need=Math.ceil((goal-sc)/per);
+    $('scoreTitle').textContent=sc>=80?'Dialed in 🔥':sc>=50?'Making moves ⚡':'Let\'s close some loops 🛠';
+    $('scoreHint').textContent=sc>=100?'Perfect day. Everything is moving.':'Clear '+need+' waiting item'+(need>1?'s':'')+' to hit '+goal+'.';
+    $('scoreMix').textContent=st.b.done+' done · '+st.b.wait+' waiting · '+st.b.block+' blocked · '+st.b.not+' not started · +'+st.today+' closed today';
+  }
+
+  // ---- Approvals (mirror of Approvals tab). First names only. ----
+  var approvals=[
+    {id:'A1', type:'Review request', title:'Google review request text (64 past customers)', who:'Marketeer',
+     draft:'Hi {first name}, thanks for choosing Berman Electric! If you have a moment, would you leave us a quick Google review? It really helps: {review link}',
+     note:'Waiting on your Google review link. Approving OKs the wording only; nothing is sent until you OK each batch.'},
+    {id:'A2', type:'Follow-up text', title:'Timothy: estimate check-in text', who:'Head Honcho', boardWait:true,
+     draft:'(Draft not written yet.) Tap Edit and tell Head Honcho what you want to say, or Approve to let Head Honcho write a short friendly check-in for your final OK.',
+     note:'Estimate follow-up is overdue on the board.'}
+  ];
+  var AK='bermanMC.appr.v1';
+  function getAppr(){try{return JSON.parse(localStorage.getItem(AK))||{};}catch(e){return {};}}
+  function setAppr(o){try{localStorage.setItem(AK,JSON.stringify(o));}catch(e){}}
+  function renderAppr(){
+    var a=getAppr(), open=0, html='';
+    approvals.forEach(function(x){
+      var st=a[x.id]; if(!st) open++;
+      html+='<div class="card appr'+(st?' done-local':'')+'" data-id="'+x.id+'"><div class="row"><h3>'+esc(x.title)+'</h3><span class="chip '+(st==='Approved'?'s-done':st==='Changes'?'s-wait':'s-prog')+'">'+(st||'Pending')+'</span></div>'+
+        '<div class="meta">'+esc(x.type)+' · '+esc(x.who)+'</div><pre>'+esc(x.draft)+'</pre><p>'+esc(x.note)+'</p>'+
+        (st?'<div class="st" id="st'+x.id+'">'+(st==='Approved'?'✓ Approved':'✎ Changes sent')+' · <button class="mini-undo" data-undo="'+x.id+'" style="background:none;border:none;color:var(--teal);text-decoration:underline;cursor:pointer">undo</button></div>':
+        '<div class="acts"><button class="ok" data-ok="'+x.id+'">✓ Approve</button><button class="ed" data-ed="'+x.id+'">✎ Edit</button></div>'+
+        '<div hidden id="box'+x.id+'"><textarea id="note'+x.id+'" placeholder="What should change?"></textarea><div class="acts" style="margin-top:6px"><button class="ed" data-send="'+x.id+'">Send changes</button></div></div><div class="st" id="st'+x.id+'"></div>')+'</div>';
+    });
+    $('apprGrid').innerHTML=html; $('apprCnt').textContent=open+' pending'; renderScore();
+  }
+  // Try the dedicated 'approve' action; if the deployed script is older, fall back to built-in done/ask actions.
+  function sendAppr(x,status,note){
+    return api({action:'approve',id:x.id,status:status,note:note||''}).catch(function(e){
+      if(!/unknown action/.test(e.message)) throw e;
+      if(status==='Approved') return api({action:'done',item:'APPROVAL '+x.id+': '+x.title});
+      return api({action:'ask',bot:x.who,question:'[Approval '+x.id+' · Changes] '+x.title+' → '+note});
+    });
+  }
+  function act(id,status,note){
+    var x=approvals.filter(function(y){return y.id===id;})[0], a=getAppr(); a[id]=status; setAppr(a); renderAppr();
+    var el=$('st'+id); if(!conn()){ if(el) el.textContent+=' (saved on this phone; tap Connect to sync)'; return; }
+    if(el) el.textContent+=' · saving…';
+    sendAppr(x,status,note).then(function(){var el=$('st'+id); if(el) el.innerHTML=el.innerHTML.replace(' · saving…',' · on board ✓');})
+      .catch(function(e){var a=getAppr(); delete a[id]; setAppr(a); renderAppr(); var el=$('st'+id); if(el) el.textContent='⚠ Not saved: '+e.message;});
+  }
+  $('apprGrid').addEventListener('click',function(e){var t=e.target, d=t.dataset;
+    if(d.ok) act(d.ok,'Approved');
+    else if(d.ed){ $('box'+d.ed).hidden=false; $('note'+d.ed).focus(); }
+    else if(d.send){ var n=$('note'+d.send).value.trim(); if(!n){ $('note'+d.send).placeholder='Type what to change first'; return;} act(d.send,'Changes',n); }
+    else if(d.undo){ var a=getAppr(); delete a[d.undo]; setAppr(a); renderAppr(); }
+  });
   showConn();
   document.getElementById('resetTicks').addEventListener('click',function(){setTicks({});renderWaiting();});
-  renderWaiting();
+  window.__mcReady=1; renderWaiting(); renderAppr();
 
   // ---- Crew ----
   var crew = [
