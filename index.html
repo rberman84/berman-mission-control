@@ -128,9 +128,8 @@ var BOTS=[
 
 // ---- Snapshot fallback (first names only, no addresses/phones/money) ----
 var SNAP={board:[
- {row:2,item:'Abhik new lead: fan install',area:'Leads',owner:'Marketeer',status:'Waiting on Rob',next:'OK a reply draft',due:'',updated:''},
- {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job today',due:'2026-10-15',updated:''},
- {row:4,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Send notes after for draft estimate',due:'2026-10-15',updated:''}
+ {row:13,item:'Randall Thu job, 3 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Job 3 PM, Setauket',due:'2026-10-15',updated:''},
+ {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Job 1:30 PM today, East Northport',due:'2026-10-15',updated:''}
 ],approvals:[]};
 var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
 
@@ -222,7 +221,7 @@ function nextLine(st){
 }
 
 // ---- Today: next 2 appointments ----
-var TOWNS=['Lake Ronkonkoma','Ronkonkoma','Islandia','East Setauket','Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset'];
+var TOWNS=['East Northport','Lake Ronkonkoma','Ronkonkoma','Islandia','East Setauket','Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset'];
 var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
 function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;});return best;}
 function stopOf(r){
