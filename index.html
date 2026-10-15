@@ -106,7 +106,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <script>
 (function(){
 'use strict';
-var BUILD='2026-10-15e';
+var BUILD='2026-10-15f';
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
@@ -350,7 +350,7 @@ $('sendTop').onclick=function(){var t=['t1','t2','t3'].map(function(i){return $(
 $('suSave').onclick=function(){var u=$('suUrl').value.trim(),p=$('suPin').value.trim();
   if(!u)u=DEFURL;if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u))return toast('URL must end with /exec');if(p.length<4)return toast('Enter your PIN');
   saveConn({url:u||DEFURL,pin:p});api({action:'ping'}).then(function(){toast('✓ Connected');renderMore();refresh();}).catch(function(e){toast(e.message);});};
-$('suClear').onclick=function(){localStorage.removeItem(CK);document.cookie='mcpin=; max-age=0; path=/';try{indexedDB.deleteDatabase('mc');}catch(e){}renderMore();toast('Disconnected');};
+$('suClear').onclick=function(){if(!confirm('Disconnect Mission Control from your board?'))return;localStorage.removeItem(CK);document.cookie='mcpin=; max-age=0; path=/';try{indexedDB.deleteDatabase('mc');}catch(e){}renderMore();toast('Disconnected');};
 
 // ---- Command bar: sends to Inbox via 'ask', optional @bot routing ----
 function route(q){var m=q.match(/^@(\w+)\s*/);if(!m)return {bot:'Head Honcho',q:q};var k=m[1].toLowerCase();
@@ -380,7 +380,8 @@ function refresh(){
 }
 var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
 function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
-  if(v&&v.build&&v.build!==BUILD){var k='bermanMC.reload';if(sessionStorage.getItem(k)===v.build)return;sessionStorage.setItem(k,v.build);location.replace(location.pathname+'?v='+v.build);}}).catch(function(){});}
+  if(v&&v.build&&v.build!==BUILD){var k='bermanMC.reload';if(sessionStorage.getItem(k)===v.build)return;sessionStorage.setItem(k,v.build);location.reload();}}).catch(function(){});}
+try{if(/[?&]v=/.test(location.search))history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
 render();refresh();verCheck();
 setInterval(function(){if(!document.hidden)refresh();},60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden){refresh();verCheck();}});

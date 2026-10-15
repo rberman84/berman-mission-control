@@ -457,13 +457,13 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     $('askMsg').textContent=c?'':'Not connected yet. Tap Connect above to send.';}
   $('openSetup').onclick=function(){var c=conn()||{}; $('suUrl').value=c.url||''; $('suPin').value=''; $('suMsg').textContent=''; $('setup').hidden=false;};
   $('suClose').onclick=function(){$('setup').hidden=true;};
-  $('suClear').onclick=function(){localStorage.removeItem(CK); showConn(); $('suMsg').textContent='Disconnected.';};
+  $('suClear').onclick=function(){if(!confirm('Disconnect Mission Control from your board?'))return;localStorage.removeItem(CK); showConn(); $('suMsg').textContent='Disconnected.';};
   $('suSave').onclick=function(){var u=$('suUrl').value.trim(), p=$('suPin').value.trim();
     if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u)){ $('suMsg').textContent='That URL should start with https://script.google.com/macros/s/ and end with /exec'; return;}
     if(!p){ $('suMsg').textContent='Enter your PIN.'; return;}
     localStorage.setItem(CK,JSON.stringify({url:u,pin:p})); $('suMsg').textContent='Testing…';
     api({action:'ping'}).then(function(){ $('suMsg').textContent='Connected ✓'; showConn(); refresh(); setTimeout(function(){$('setup').hidden=true;},800);})
-      .catch(function(e){ localStorage.removeItem(CK); showConn(); $('suMsg').textContent='Could not connect: '+e.message;});};
+      .catch(function(e){ showConn(); $('suMsg').textContent='Could not connect: '+e.message;});};
   $('waitGrid').addEventListener('click',function(e){
     var btn=e.target.closest('.tick'); if(!btn) return;
     var id=btn.dataset.id, w=waiting.filter(function(x){return x.id===id;})[0];
