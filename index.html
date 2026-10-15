@@ -38,7 +38,8 @@ h2{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase
 .g{background:var(--ac)}.a{background:var(--amb)}.r{background:var(--red)}.n{background:#4a535c}
 .stop{display:flex;align-items:center;gap:6px}.stop .who{flex:1;min-width:0}.stop .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stop .who b em{font-style:normal;color:var(--ac);margin-right:6px}
 .stop .who span{display:block;color:var(--dim);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ib{width:42px;height:44px;border-radius:12px;background:#1d232a;font-size:17px;flex:none}.ib.go{background:var(--ac);color:#06231b;width:56px;font-weight:700;font-size:15px}
+.ib{width:42px;height:44px;border-radius:12px;background:#1d232a;font-size:17px;flex:none}[hidden]{display:none!important}.ib.dn{background:#1d232a;color:var(--ac);width:auto;padding:0 10px;font-weight:700;font-size:14px}.okm2{color:var(--ac);font-size:13px;margin-top:6px}.stop.fin{border-color:rgba(127,227,196,.5);flex-wrap:wrap}.wk .row{padding:9px 2px}
+.ib.go{background:var(--ac);color:#06231b;width:56px;font-weight:700;font-size:15px}
 .bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:8px;max-width:520px;margin:0 auto}
 .bar input{flex:1;min-height:50px;border-radius:25px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;padding:0 18px;font-size:16px}
 .bar button{width:50px;height:50px;border-radius:25px;background:var(--card);border:1px solid var(--line);font-size:18px}.bar .send{background:var(--ac);color:#06231b;border:0}
@@ -64,6 +65,8 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <h2><span>Needs you</span><span id="needCnt"></span></h2>
 <div id="needs"></div>
 
+<div id="wkTop" hidden><h2><span>This week</span></h2><div id="wkCard"></div></div>
+
 <h2><span>Today</span><span id="dayLbl"></span></h2>
 <div id="today"></div>
 
@@ -83,6 +86,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
   <div class="grab"></div>
   <h2 style="margin-top:4px"><span>This week</span></h2>
   <div class="kv" id="nums"></div>
+  <h2><span>Week plan</span></h2><div id="wkSheet"></div>
   <h2><span>Pipeline</span></h2><div id="pipe"></div>
   <h2><span>More waiting</span></h2><div id="overflow"></div>
   <h2><span>Weekly reset</span></h2>
@@ -236,7 +240,7 @@ function stopOf(r){
   var kind=/estimate/.test(low)?'Estimate':/job|install/.test(low)?'Job':'Visit';
   var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|fan|outlet)/i)||[])[1]||'';
   return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:h*60+m,
-    time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():'')};
+    time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():''),st:stKey(r.status)};
 }
 function stops(){
   var now=new Date(),td=ymd(now),tm=ymd(new Date(now.getTime()+864e5)),p=nyParts(now),nowM=+p.hour*60+ +p.minute;
@@ -244,18 +248,26 @@ function stops(){
    .sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;}).slice(0,2)
    .map(function(x){x.day=x.date===td?'':'Tmrw ';return x;});
 }
-var STOPS=[];
+var STOPS=[],FIN={};  // FIN: row -> green finish message
 function renderToday(){
   STOPS=stops();
   $('dayLbl').textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}).format(new Date());
   $('today').innerHTML=STOPS.length?STOPS.map(function(x,i){
-    return '<div class="card stop" data-i="'+i+'"><div class="who"><b><em>'+esc(x.day+x.time)+'</em>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
-     '<button class="ib" data-a="call" aria-label="Call">📞</button><button class="ib" data-a="sms" aria-label="Text">💬</button><button class="ib" data-a="cal" aria-label="Add to Calendar">📅</button><button class="ib go" data-a="go">Go</button></div>';
+    return '<div class="card stop'+(FIN[x.row]?' fin':'')+'" data-i="'+i+'"><div class="who"><b><em>'+esc(x.day+x.time)+'</em>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
+     (FIN[x.row]||x.st==='done'?'':'<button class="ib dn" data-a="done" aria-label="Job done">Done</button>')+'<button class="ib" data-a="call" aria-label="Call">📞</button><button class="ib" data-a="sms" aria-label="Text">💬</button><button class="ib" data-a="cal" aria-label="Add to Calendar">📅</button><button class="ib go" data-a="go">Go</button>'+(FIN[x.row]?'<div class="okm2" style="flex-basis:100%">✓ '+esc(FIN[x.row])+'</div>':'')+'</div>';
   }).join(''):'<div class="empty">Open road. Nothing booked next.</div>';
 }
 function go(url){window.location.href=url;}
 $('today').addEventListener('click',function(e){
   var b=e.target.closest('button[data-a]');if(!b)return;var x=STOPS[+b.closest('.stop').dataset.i];if(!x)return;var a=b.dataset.a;
+  if(a==='done'){
+    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
+    b.disabled=true;b.textContent='…';
+    return api({action:'done',item:x.item,row:x.row,finish:true}).then(function(j){
+      FIN[x.row]=j.finished?(j.queued===false?'Marked done. Review text was already waiting.':'Marked done. Review text is waiting for your approval.'):'Marked done. Review text needs the script update.';
+      render();toast('✓ Saved');refreshSoon();
+    }).catch(function(err){b.disabled=false;b.textContent='Done';toast('Didn\'t save: '+err.message);});
+  }
   if(a==='go'){
     var fb=function(why){toast(why);go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY'));};
     if(!conn())return fb('Town only. Connect ⚙︎ for exact address.');
@@ -271,6 +283,21 @@ $('today').addEventListener('click',function(e){
     var u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})),l=document.createElement('a');l.href=u;l.download=x.name+'.ics';document.body.appendChild(l);l.click();l.remove();
   }
 });
+
+// ---- Weekly plan (Mondays on top; always in More) ----
+function weekPlan(){
+  var now=new Date(),p=nyParts(now),dow=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay(),mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day-((dow+6)%7)));
+  var from=mon.toISOString().slice(0,10),to=new Date(mon.getTime()+6*864e5).toISOString().slice(0,10);
+  var R=rows(),jobs=R.map(stopOf).filter(function(x){return x&&x.date>=from&&x.date<=to;}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;});
+  var leads=(S.approvals||[]).filter(function(x){return isLead(x.type);}).length+R.filter(function(r){return /new lead|schedule (an )?(estimate )?visit/i.test(r.item)&&stKey(r.status)!=='done';}).length;
+  var g=R.filter(function(r){return /marketeer|seo|aeo|video/i.test(r.owner||'')&&stKey(r.status)!=='done'&&stKey(r.status)!=='block';})[0];
+  var wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var jl=jobs.length?jobs.slice(0,6).map(function(x){var d=new Date(x.date+'T12:00:00Z');return '<div class="row">'+esc(wd[d.getUTCDay()]+' '+x.time+' · '+x.name)+'<span>'+esc(x.town||x.kind)+'</span></div>';}).join(''):'<div class="row">No jobs or visits on the board yet<span></span></div>';
+  var mv=g?'<div class="row">Growth move: '+esc(g.item)+'<span>'+esc(g.owner)+'</span></div>':'<a class="lnk" style="margin-top:8px" href="'+CHAT+BOTS[1].id+'">Ask Marketeer for this week\'s move<span>↗</span></a>';
+  return '<div class="card wk">'+jl+'<div class="row">Open leads<span>'+leads+'</span></div>'+mv+'</div>';
+}
+function renderWeek(){var h=weekPlan(),p=nyParts(new Date());$('wkSheet').innerHTML=h;
+  var mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay()===1;$('wkTop').hidden=!mon;if(mon)$('wkCard').innerHTML=h;}
 
 // ---- Bot tiles ----
 function renderBots(){
@@ -318,7 +345,7 @@ $('mic').onclick=function(){var SR=window.SpeechRecognition||window.webkitSpeech
 function render(){
   var sc=score(),col=sc>=80?'#7fe3c4':sc>=50?'#9fd3ff':'#f2c46d';
   $('score').textContent=sc;$('arc').style.strokeDashoffset=(169.6*(1-sc/100)).toFixed(1);$('arc').style.stroke=col;
-  renderNeeds();renderToday();renderBots();$('nextLine').textContent=nextLine(STOPS);
+  renderNeeds();renderToday();renderBots();renderWeek();$('nextLine').textContent=nextLine(STOPS);
 }
 var busy=false;
 function refresh(){
