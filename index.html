@@ -4,6 +4,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Mission">
 <meta name="theme-color" content="#0b0d10"><meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache">
 <title>Mission Control</title>
 <style>
 :root{--bg:#0b0d10;--card:#14181d;--line:#222830;--tx:#e9eef2;--dim:#8a949e;--ac:#7fe3c4;--amb:#f2c46d;--red:#ef7d7d}
@@ -105,6 +106,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <script>
 (function(){
 'use strict';
+var BUILD='2026-10-15b';
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
@@ -116,7 +118,7 @@ var CK='bermanMC.conn.v1';
 function conn(){try{return JSON.parse(localStorage.getItem(CK))||null;}catch(e){return null;}}
 function api(body){var c=conn();if(!c)return Promise.reject(new Error('not connected'));body.pin=c.pin;
   return fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
-   .then(function(r){return r.json();}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
+   .then(function(r){return r.text();}).then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('script not reachable');}return j;}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
 
 // ---- Bots ----
 var CHAT='grokbot://app/v1/agent?id=';
@@ -135,6 +137,7 @@ var SNAP={board:[
  {row:13,item:'Randall Thu job, 3 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Job 3 PM, Setauket',due:'2026-10-15',updated:''},
  {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Job 1:30 PM today, East Northport',due:'2026-10-15',updated:''}
 ],approvals:[]};
+var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
 var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
 
 function stKey(x){x=String(x||'').toLowerCase();return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
@@ -231,20 +234,23 @@ function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.l
 function stopOf(r){
   var t=String(r.item||'')+' '+String(r.next||''),low=t.toLowerCase();
   if(!/visit|job|appointment|install|service call|walkthrough/.test(low)||/^schedule /i.test(r.item)||stKey(r.status)==='done'&&!/job/.test(low))return null;
-  var tm=String(r.item).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i)||t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i);if(!tm)return null;
-  var date=/^\d{4}-\d{2}-\d{2}/.test(r.due)?r.due.slice(0,10):'';
+  var tbd=/\btbd\b/i.test(r.item);
+  var tm=String(r.item).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i)||(!tbd&&t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i));if(!tm&&!tbd)return null;
+  var due=String(r.due||''),date=/^\d{4}-\d{2}-\d{2}/.test(due)?due.slice(0,10):'';
+  // A date-only cell read in UTC comes back as 7/8 PM ET the day before; shift it back.
+  if(date&&/ (19|20):00$/.test(due)){var dd=new Date(date+'T12:00:00Z');dd.setUTCDate(dd.getUTCDate()+1);date=dd.toISOString().slice(0,10);}
   var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
   if(!date&&dm)date=nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');
   if(!date)return null;
-  var h=+tm[1]%12+(/pm/i.test(tm[3])?12:0),m=+(tm[2]||0);
+  var h=tm?+tm[1]%12+(/pm/i.test(tm[3])?12:0):0,m=tm?+(tm[2]||0):0;
   var kind=/estimate/.test(low)?'Estimate':/job|install/.test(low)?'Job':'Visit';
   var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|fan|outlet)/i)||[])[1]||'';
-  return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:h*60+m,
-    time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():''),st:stKey(r.status)};
+  return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:tbd&&!tm?-1:h*60+m,tbd:tbd&&!tm,
+    time:tbd&&!tm?'Time TBD':(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():''),st:stKey(r.status)};
 }
 function stops(){
   var now=new Date(),td=ymd(now),tm=ymd(new Date(now.getTime()+864e5)),p=nyParts(now),nowM=+p.hour*60+ +p.minute;
-  return rows().map(stopOf).filter(function(x){return x&&(x.date===tm||x.date===td&&x.mins+90>=nowM);})
+  return rows().map(stopOf).filter(function(x){return x&&x.st!=='done'&&(x.date===tm||x.date===td&&(x.tbd||x.mins+90>=nowM));})
    .sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;}).slice(0,2)
    .map(function(x){x.day=x.date===td?'':'Tmrw ';return x;});
 }
@@ -277,9 +283,10 @@ $('today').addEventListener('click',function(e){
     api({action:'phone',row:x.row,item:x.item}).then(function(j){go((a==='call'?'tel:':'sms:')+String(j.phone).replace(/[^\d+]/g,''));})
      .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':/no (number|phone)/.test(err.message)?'No number on file':'No number: '+err.message);});
   } else if(a==='cal'){
+    if(x.tbd)return toast('Set the time first');
     var p=function(n){return String(n).padStart(2,'0');},d=x.date.replace(/-/g,''),st=d+'T'+p(x.h)+p(x.m)+'00',eh=x.h+1;
     var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berman//MC//EN','BEGIN:VEVENT','UID:mc-'+x.row+'-'+d+'@berman','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
-      'DTSTART;TZID=America/New_York:'+st,'DTEND;TZID=America/New_York:'+d+'T'+p(eh)+p(x.m)+'00','SUMMARY:'+x.name+' · '+x.kind,'LOCATION:'+(x.town?x.town+', NY':''),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+      'DTSTART;TZID=America/New_York:'+st,'DTEND;TZID=America/New_York:'+d+'T'+p(Math.min(eh,23))+p(eh>23?59:x.m)+'00','SUMMARY:'+x.name+' · '+x.kind,'LOCATION:'+(x.town?x.town+', NY':''),'END:VEVENT','END:VCALENDAR'].join('\r\n');
     var u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})),l=document.createElement('a');l.href=u;l.download=x.name+'.ics';document.body.appendChild(l);l.click();l.remove();
   }
 });
@@ -351,14 +358,16 @@ var busy=false;
 function refresh(){
   if(!conn()){render();return Promise.resolve();}
   if(busy)return Promise.resolve();busy=true;
-  return api({action:'state'}).then(function(j){S=j;live=true;
+  return api({action:'state'}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;live=true;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
     var p=nyParts(new Date()),h=+p.hour;$('live').textContent='● Live · '+(h%12||12)+':'+p.minute+' '+(h>=12?'PM':'AM');$('live').className='live on';
-  }).catch(function(){$('live').textContent=live?'● Offline, last update shown':'● Offline snapshot';$('live').className='live';})
+  }).catch(function(){$('live').textContent=live?'● Offline, last update shown':S.at?'● Offline · last live '+S.at.slice(5):'● Offline snapshot';$('live').className='live';})
    .then(function(){busy=false;render();});
 }
 var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
-render();refresh();
+function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
+  if(v&&v.build&&v.build!==BUILD){var k='bermanMC.reload';if(sessionStorage.getItem(k)===v.build)return;sessionStorage.setItem(k,v.build);location.replace(location.pathname+'?v='+v.build);}}).catch(function(){});}
+render();refresh();verCheck();
 setInterval(function(){if(!document.hidden)refresh();},60000);
-document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){refresh();verCheck();}});
 })();
 </script></body></html>
