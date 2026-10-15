@@ -106,7 +106,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <script>
 (function(){
 'use strict';
-var BUILD='2026-10-15b';
+var BUILD='2026-10-15c';
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
@@ -117,7 +117,10 @@ function ymd(d){var p=nyParts(d);return p.year+'-'+p.month+'-'+p.day;}
 var CK='bermanMC.conn.v1';
 function conn(){try{return JSON.parse(localStorage.getItem(CK))||null;}catch(e){return null;}}
 function api(body){var c=conn();if(!c)return Promise.reject(new Error('not connected'));body.pin=c.pin;
-  return fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
+  var ac=window.AbortController?new AbortController():null;
+  var f=fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),cache:'no-store',signal:ac?ac.signal:undefined});
+  var to=new Promise(function(_,rej){setTimeout(function(){if(ac)ac.abort();rej(new Error('timed out'));},25000);});
+  return Promise.race([f,to])
    .then(function(r){return r.text();}).then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('script not reachable');}return j;}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
 
 // ---- Bots ----
@@ -358,9 +361,10 @@ var busy=false;
 function refresh(){
   if(!conn()){render();return Promise.resolve();}
   if(busy)return Promise.resolve();busy=true;
-  return api({action:'state'}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;live=true;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
+  var st=function(){return api({action:'state'});};
+  return st().catch(function(e){if(/not connected|PIN|pin/.test(e.message))throw e;return new Promise(function(r){setTimeout(r,2500);}).then(st);}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;live=true;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
     var p=nyParts(new Date()),h=+p.hour;$('live').textContent='● Live · '+(h%12||12)+':'+p.minute+' '+(h>=12?'PM':'AM');$('live').className='live on';
-  }).catch(function(){$('live').textContent=live?'● Offline, last update shown':S.at?'● Offline · last live '+S.at.slice(5):'● Offline snapshot';$('live').className='live';})
+  }).catch(function(e){try{$('live').title=e&&e.message||'';}catch(_){}$('live').textContent=live?'● Offline, last update shown':S.at?'● Offline · last live '+S.at.slice(5):'● Offline snapshot';$('live').className='live';})
    .then(function(){busy=false;render();});
 }
 var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
@@ -369,5 +373,7 @@ function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('version
 render();refresh();verCheck();
 setInterval(function(){if(!document.hidden)refresh();},60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden){refresh();verCheck();}});
+window.addEventListener('pageshow',function(e){if(e.persisted){busy=false;refresh();verCheck();}});
+window.addEventListener('online',function(){busy=false;refresh();});
 })();
 </script></body></html>
