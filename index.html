@@ -28,6 +28,8 @@ h2{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase
 .acts .pri{background:var(--ac);color:#06231b}
 .card.ok{border-color:rgba(127,227,196,.5)}.card.ok .okm{color:var(--ac);font-size:14px;margin-top:8px}
 .note{width:100%;margin-top:10px;background:#0f1216;border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:10px;min-height:44px}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;background:var(--amb);color:#2a1d00;border-radius:6px;padding:2px 6px;margin-right:6px;vertical-align:2px}.age{color:var(--dim);font-weight:400;font-size:12px;margin-left:4px}
+.card.ok .acts{margin-top:8px}
 .empty{color:var(--dim);font-size:15px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:16px}
 .bots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .bot{display:flex;flex-direction:column;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 8px;min-height:60px;min-width:0;text-decoration:none;color:var(--tx)}
@@ -136,16 +138,29 @@ function stKey(x){x=String(x||'').toLowerCase();return /done/.test(x)?'done':/wa
 function rows(){return (S.board||[]).filter(function(r){return r.item;});}
 
 // ---- Needs you: approvals first, then rows waiting on Rob ----
+var KEPT={}, SMSU={};  // KEPT: approved cards kept on screen after refresh; SMSU: id -> sms: url or 'none'
+function isLead(t){return /new lead/i.test(t||'');}
+function isText(t){return /\btext\b|lead reply/i.test(t||'')&&!/review request/i.test(t||'');}
+function nyMs(str){var m=String(str||'').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/);if(!m)return NaN;
+  var now=new Date(),p=nyParts(now),off=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute)-Math.floor(now.getTime()/6e4)*6e4;
+  return Date.UTC(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0))-off;}
+function ago(str){var t=nyMs(str);if(isNaN(t))return '';var mn=Math.max(0,Math.round((Date.now()-t)/6e4));
+  return mn<60?mn+'m ago':mn<2880?Math.round(mn/60)+'h ago':Math.round(mn/1440)+'d ago';}
 function needs(){
-  var a=(S.approvals||[]).map(function(x){return {id:'A:'+x.id,kind:'appr',aid:x.id,t:x.title||x.id,d:x.draft||x.type||'',who:'Head Honcho'};});
+  var a=(S.approvals||[]).map(function(x){return {id:'A:'+x.id,kind:'appr',aid:x.id,t:x.title||x.id,d:x.draft||x.type||'',who:'Head Honcho',lead:isLead(x.type),text:isText(x.type),created:x.created||''};});
+  a=a.filter(function(x){return x.lead;}).sort(function(p,q){return (nyMs(q.created)||0)-(nyMs(p.created)||0);}).concat(a.filter(function(x){return !x.lead;}));
+  Object.keys(KEPT).forEach(function(k){if(!a.some(function(y){return y.id===k;}))a.unshift(KEPT[k]);});
   var w=rows().filter(function(r){return stKey(r.status)==='wait'&&!/^APPROVAL /.test(r.item);})
     .map(function(r){return {id:'R:'+r.row,kind:'row',row:r.row,item:r.item,t:r.item,d:r.next||'',who:r.owner||'Head Honcho'};});
   return a.concat(w);
 }
 function cardHtml(x){
   var L=local[x.id];
-  if(L) return '<div class="card ok" data-id="'+esc(x.id)+'"><div class="t">'+esc(x.t)+'</div><div class="okm">✓ '+esc(L)+'</div></div>';
-  return '<div class="card nc" data-id="'+esc(x.id)+'"><div class="tx"><div class="t">'+esc(x.t)+'</div>'+(x.d?'<div class="d">'+esc(x.d)+'</div>':'')+'</div>'+
+  var head=(x.lead?'<span class="badge">NEW LEAD</span>':'')+esc(x.t)+(x.lead&&ago(x.created)?'<span class="age">'+esc(ago(x.created))+'</span>':'');
+  if(L){var U=SMSU[x.id];
+    return '<div class="card ok" data-id="'+esc(x.id)+'"><div class="t">'+head+'</div><div class="okm">✓ '+esc(L)+'</div>'+
+     (U&&U!=='none'&&U!=='wait'?'<div class="acts"><button class="pri" data-a="sms">💬 Text from my phone</button></div>':U==='none'?'<div class="okm" style="color:var(--dim)">No number on file</div>':'')+'</div>';}
+  return '<div class="card nc" data-id="'+esc(x.id)+'"><div class="tx"><div class="t">'+head+'</div>'+(x.d?'<div class="d">'+esc(x.d)+'</div>':'')+'</div>'+
    '<div class="acts"><button data-a="note" aria-label="Note">✎</button><button class="pri" data-a="ok">'+(x.kind==='appr'?'Approve':'Done')+'</button></div></div>';
 }
 function renderNeeds(){
@@ -159,7 +174,14 @@ function find(id){return needs().filter(function(x){return x.id===id;})[0];}
 function act(x,note){
   var p;
   if(x.kind==='appr'){
-    p=api({action:'approve',id:x.aid,status:note?'Changes':'Approved',note:note||''}).then(function(){return note?'Note sent. Head Honcho will revise.':'Approved. Head Honcho takes the next step; nothing is sent without you.';});
+    p=api({action:'approve',id:x.aid,status:note?'Changes':'Approved',note:note||''}).then(function(){
+      if(note)return 'Note sent. Head Honcho will revise.';
+      if(!x.text)return 'Approved. Head Honcho takes the next step; nothing is sent without you.';
+      KEPT[x.id]=x;SMSU[x.id]='wait';
+      api({action:'phone',id:x.aid}).then(function(j){
+        SMSU[x.id]='sms:'+String(j.phone).replace(/[^\d+]/g,'')+'&body='+encodeURIComponent(j.draft||'');local[x.id]='Approved. Messages opens with the text filled in.';render();go(SMSU[x.id]);
+      }).catch(function(err){SMSU[x.id]='none';local[x.id]='Approved.';render();if(/unknown action|approval not found/.test(err.message))toast('Texting needs the script update');});
+      return 'Approved. Getting the number…';});
   } else if(note){
     p=api({action:'ask',bot:x.who.split('/')[0].trim()||'Head Honcho',question:'[Re: '+x.item+'] '+note}).then(function(){return 'Note sent to '+(x.who||'Head Honcho')+'.';});
   } else {
@@ -171,6 +193,7 @@ function act(x,note){
 function onCardClick(e){
   var b=e.target.closest('button[data-a]');if(!b)return;var c=b.closest('.card'),x=find(c.dataset.id);if(!x)return;
   if(b.dataset.a==='ok') return act(x);
+  if(b.dataset.a==='sms'&&SMSU[x.id]&&/^sms:/.test(SMSU[x.id])) return go(SMSU[x.id]);
   if(b.dataset.a==='note'){var t=c.querySelector('textarea');
     if(!t){c.classList.remove('nc');t=document.createElement('textarea');t.className='note';t.placeholder='Your note…';c.insertBefore(t,c.querySelector('.acts'));b.textContent='Send note';b.className='pri';b.style.flex='1';t.focus();return;}
     if(t.value.trim()) act(x,t.value.trim());}
@@ -193,7 +216,7 @@ function score(){
 }
 function nextLine(st){
   var N=needs().filter(function(x){return !local[x.id];});
-  if(N.length) return N[0].kind==='appr'?'Approve: '+N[0].t:N[0].t;
+  if(N.length) return N[0].lead?'Reply to new lead: '+N[0].t:N[0].kind==='appr'?'Approve: '+N[0].t:N[0].t;
   if(st[0]) return st[0].name+' at '+st[0].time+(st[0].town?', '+st[0].town:'');
   return 'You\'re clear. Tell a bot what\'s next.';
 }
@@ -241,7 +264,7 @@ $('today').addEventListener('click',function(e){
   } else if(a==='call'||a==='sms'){
     if(!conn())return toast('Connect your Ops Board link in ⚙︎');
     api({action:'phone',row:x.row,item:x.item}).then(function(j){go((a==='call'?'tel:':'sms:')+String(j.phone).replace(/[^\d+]/g,''));})
-     .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':'No number: '+err.message);});
+     .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':/no (number|phone)/.test(err.message)?'No number on file':'No number: '+err.message);});
   } else if(a==='cal'){
     var p=function(n){return String(n).padStart(2,'0');},d=x.date.replace(/-/g,''),st=d+'T'+p(x.h)+p(x.m)+'00',eh=x.h+1;
     var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berman//MC//EN','BEGIN:VEVENT','UID:mc-'+x.row+'-'+d+'@berman','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
