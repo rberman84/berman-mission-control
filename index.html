@@ -236,7 +236,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <div class="gauge a"><div class="n" id="gWait">0</div><div class="l">Waiting on Rob</div></div>
   <div class="gauge r"><div class="n" id="gBlock">3</div><div class="l">Blocked items</div></div>
   <div class="gauge t"><div class="n">5</div><div class="l">Leads need visits</div></div>
-  <div class="gauge b"><div class="n">2</div><div class="l">On deck Thu Oct 15</div></div>
+  <div class="gauge b"><div class="n">2</div><div class="l">Today's stops</div></div>
 </div>
 
 <!-- 2. TODAY'S OPS -->
@@ -245,15 +245,15 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   <div class="body">
     <div class="ops">
       <div class="card" id="callCard">
-        <div class="row"><h3>Capitalize / Empower call</h3><span class="chip s-not" id="callChip">Scheduled</span></div>
-        <p>Wed Oct 14 · 10:20 AM ET · Rob takes the call. Head Honcho reminds 30 min before.</p>
+        <div class="row"><h3>Capitalize / Empower rollover</h3><span class="chip s-wait" id="callChip">Reschedule</span></div>
+        <p>Missed Wed Oct 14. Reschedule Mon–Fri 9–6 ET or in Robinhood. Head Honcho will remind once a new time is set.</p>
         <div class="countdown" id="callCountdown">--</div>
       </div>
       <div class="card">
         <div class="row"><h3>Rob's Copilot · schedule</h3><span class="chip s-wait">Needs Rob</span></div>
         <ul class="tight">
-          <li><b>Randall</b> Thu job shows <b>2 AM</b>. Confirm the real time (Setauket).</li>
-          <li><b>Thu Oct 15, 10 AM:</b> Loriana solar estimate visit, Islandia.</li>
+          <li><b>Loriana</b> 10 AM — solar estimate, Islandia (confirm text already sent).</li>
+          <li><b>Randall</b> 2 PM — job, Setauket (confirmed; Copilot may still show 2 AM).</li>
           <li>Code PRs <b>blocked</b> until coding usage resets or on-demand is on. Netlify credits reset <b>Oct 29</b>.</li>
         </ul>
       </div>
@@ -280,9 +280,10 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     <div class="card" style="margin-top:10px">
       <h3 style="font-size:13px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase">Also waiting on Rob (from the board)</h3>
       <ul class="tight">
-        <li><b>Timothy</b> estimate follow-up (overdue): OK the check-in text draft.</li>
+        <li><b>Capitalize / Empower</b>: missed Oct 14 — reschedule Mon–Fri 9–6 ET or in Robinhood.</li>
         <li><b>Video captions</b>: Video Creation Expert waiting on Rob.</li>
         <li><b>Money Man</b>: connect or list the non-Chase cards.</li>
+        <li><b>Diy Machine</b>: define a lane or archive it.</li>
       </ul>
     </div>
     <div class="mini" id="linkNote">Ops Board link: <b id="linkState">not connected</b>. Taps are saved on this phone only until you connect. <button id="openSetup">Connect</button> <button id="resetTicks">Reset</button></div>
@@ -323,14 +324,14 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
         <div class="x">Mike (Centereach) · Luann (Syosset) · Matt · Adnan · Susan</div></div>
       <div class="stat"><div class="n" style="color:var(--blue)">1</div><div class="l">Won, not yet a job</div>
         <div class="x">Phil (Wading River): lighting. Set up the job in the app.</div></div>
-      <div class="stat"><div class="n" style="color:var(--red)">1</div><div class="l">Estimate past follow-up</div>
-        <div class="x">Timothy: check-in text waiting on Rob's OK.</div></div>
-      <div class="stat"><div class="n" style="color:var(--amber)">Thu</div><div class="l">Oct 15 · on deck</div>
-        <div class="x"><b>10 AM</b> Loriana: solar estimate, Islandia. Notes after for a draft estimate.<br>Randall job: real time TBD.</div></div>
+      <div class="stat"><div class="n" style="color:var(--green)">0</div><div class="l">Estimate past follow-up</div>
+        <div class="x">Timothy check-in: Done (Rob handled).</div></div>
+      <div class="stat"><div class="n" style="color:var(--amber)">Thu</div><div class="l">Oct 15 · today</div>
+        <div class="x"><b>10 AM</b> Loriana: solar estimate, Islandia (confirm sent).<br><b>2 PM</b> Randall: job, Setauket (confirmed).</div></div>
     </div>
     <div class="card" style="margin-top:10px">
-      <div class="row"><h3>Google reviews</h3><span class="chip s-wait">Waiting on Rob</span></div>
-      <p>Marketeer's read: about <b style="color:var(--text)">27–31</b> reviews today vs. a <b style="color:var(--text)">150–400</b> benchmark. 64 past customers are ready for requests once the link and text are approved.</p>
+      <div class="row"><h3>Google reviews</h3><span class="chip s-done">34 · 5.0</span></div>
+      <p>Google Maps Oct 15: <b style="color:var(--text)">34</b> reviews at <b style="color:var(--text)">5.0</b> (was 33 before the Oct 14 blast). New overnight: Dominican (5★). Benchmark still ~150+. Review-request blast of 62 sent Oct 14.</p>
     </div>
   </div>
 </details>
@@ -393,7 +394,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   </div>
 </details>
 
-<footer>Board snapshot: Wed Oct 14, 2026 · Source: Live Operations Board + Berman Electric Operating System · Nothing goes to customers without Rob's OK.</footer>
+<footer>Board snapshot: Thu Oct 15, 2026 · Source: Live Operations Board + Berman Electric Operating System · Nothing goes to customers without Rob's OK.</footer>
 </div>
 
 <script>
@@ -405,14 +406,18 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 
   // ---- Waiting on Rob (big decisions) ----
   var waiting = [
-    {id:'review', item:'Google review link + review text OK', t:'Google review link + review text OK', d:'Grab the review link from GBP and approve the request text. 64 past customers ready, sent in small weekly batches.', who:'Marketeer', s:'wait'},
+    {id:'review', item:'Google review link + review text OK', t:'Google review link + review text OK', d:'Done. Blast of 62 sent Oct 14. Link live on GBP.', who:'Marketeer', s:'done'},
+    {id:'timothy', item:'Timothy estimate check-in', t:'Timothy check-in', d:'Done. Rob handled already.', who:'Head Honcho', s:'done'},
+    {id:'randall', item:'Randall Thu job time', t:'Randall: 2 PM confirmed', d:'Done. Rob confirmed 2 PM Setauket. Copilot may still show 2 AM — fix in app when coding is unblocked.', who:'Rob', s:'done'},
     {id:'faq', item:'SEO FAQ / price cleanup', t:'FAQ / price fixes on the site', d:'Decide what the panel price includes so the site tells one consistent price story.', who:'SEO & AEO Desk', s:'wait'},
-    {id:'bills', item:'Money Man: personal vs. business bill tagging', t:'Personal vs. business bill tagging', d:'Confirm the unclear items so Money Man can sort the books. No cash alerts.', who:'Money Man', s:'wait'},
+    {id:'bills', item:'Money Man: personal vs. business bill tagging', t:'Personal vs. business bill tagging', d:'Confirm the unclear items so Money Man can sort the books. No cash alerts. Also: connect or list non-Chase cards.', who:'Money Man', s:'wait'},
     {id:'visits', item:'Estimate-visit times (Mike, Luann, Matt, Adnan, Susan)', t:'Estimate-visit times', d:'Mike · Luann · Matt · Adnan · Susan. Head Honcho drafts times, Rob picks.', who:'Head Honcho', s:'not'},
     {id:'sql', item:'Run 74-address SQL update in Lovable', t:'74-address SQL in Lovable', d:'Run the 74-address SQL update in Lovable.', who:'Rob', s:'wait'},
-    {id:'gbp', item:'Fix Google Business Profile + get review link', t:'Google Business Profile fix', d:'Sign in, fix the dead website link, hide the home address (service-area setting).', who:'Marketeer / Rob', s:'wait'},
+    {id:'gbp', item:'Fix Google Business Profile remaining', t:'GBP remaining fixes', d:'Still need: fix dead website link, hide home address (service-area). Review link is done.', who:'Marketeer / Rob', s:'wait'},
     {id:'thumb', item:'Reconnect Thumbtack messaging', t:'Reconnect Thumbtack', d:'Reconnect the messaging permission. This also unblocks intake-form auto-send.', who:'Rob', s:'wait'},
-    {id:'randall', item:'Randall Solomon Thu job time shows 2 AM', t:'Randall: real job time', d:'The app shows 2 AM Thu. Confirm the real time (Setauket).', who:'Rob · due Thu Oct 15', s:'wait'}
+    {id:'cap', item:'Capitalize / Empower rollover reschedule', t:'Capitalize / Empower reschedule', d:'Missed Oct 14 call. Reschedule Mon–Fri 9–6 ET or in Robinhood.', who:'Rob · Money Man', s:'wait'},
+    {id:'video', item:'Video captions input', t:'Video captions', d:'Video Creation Expert waiting on Rob\'s input on captions.', who:'Video Creation Expert', s:'wait'},
+    {id:'diy', item:'Diy Machine role', t:'Diy Machine role', d:'Define a lane or archive it. Does nothing until then.', who:'Rob', s:'not'}
   ];
   var KEY='bermanMC.handled.v1';
   function getTicks(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
@@ -420,7 +425,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   function renderWaiting(){
     var ticks=getTicks(), html='', open=0;
     waiting.forEach(function(w){
-      var h=!!ticks[w.id]; if(!h) open++;
+      var h=!!ticks[w.id] || w.s==='done'; if(!h) open++;
       html+='<div class="card wait'+(h?' done-local':'')+'"><div class="row"><h3>'+esc(w.t)+'</h3>'+chip(w.s)+'</div>'+
         '<p>'+esc(w.d)+'</p><div class="meta">Lane: '+esc(w.who)+'</div>'+
         '<button class="tick" data-id="'+w.id+'">'+(h?'↺ Undo':'✓ Mark done')+'</button></div>';
@@ -474,8 +479,8 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     api({action:'ask',question:q,bot:$('askBot').value}).then(function(){ refreshSoon(); $('askQ').value=''; $('askMsg').textContent='Sent ✓ Head Honcho will reply in chat.';})
       .catch(function(e){ $('askMsg').textContent='Not sent: '+e.message;});};
 
-  // ---- Board snapshot (statuses from Ops Board, Oct 14) for the Daily Score ----
-  var board={done:4,prog:0,wait:8,block:3,not:8};
+  // ---- Board snapshot (statuses from Ops Board, Oct 15) for the Daily Score ----
+  var board={done:7,prog:0,wait:6,block:3,not:7};
   function scoreState(){
     var t=getTicks(), a=getAppr(), b={done:board.done,prog:board.prog,wait:board.wait,block:board.block,not:board.not}, today=0;
     waiting.forEach(function(w){ if(t[w.id]){ b.done++; if(w.s==='wait') b.wait--; else b.not--; today++; }});
@@ -499,15 +504,17 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
 
   // ---- Approvals (mirror of Approvals tab). First names only. ----
   var approvals=[
-    {id:'A1', type:'Review request', title:'Google review request text (64 past customers)', who:'Marketeer',
+    {id:'A1', type:'Review request', title:'Google review request text — sent Oct 14 (62)', who:'Marketeer',
      draft:'Hi {first name}, thanks for choosing Berman Electric! If you have a moment, would you leave us a quick Google review? It really helps: {review link}',
-     note:'Waiting on your Google review link. Approving OKs the wording only; nothing is sent until you OK each batch.'},
+     note:'A1 Approved and sent via Copilot Text Blast (62 delivered Oct 14). No action needed.'},
     {id:'A2', type:'Follow-up text', title:'Timothy: estimate check-in text', who:'Head Honcho', boardWait:true,
-     draft:'(Draft not written yet.) Tap Edit and tell Head Honcho what you want to say, or Approve to let Head Honcho write a short friendly check-in for your final OK.',
-     note:'Estimate follow-up is overdue on the board.'}
+     draft:'(Handled by Rob.)',
+     note:'A2 Changes / handled by Rob already. No action needed.'}
   ];
   var AK='bermanMC.appr.v1';
-  function getAppr(){try{return JSON.parse(localStorage.getItem(AK))||{};}catch(e){return {};}}
+  function getAppr(){try{var o=JSON.parse(localStorage.getItem(AK)); if(o&&typeof o==='object') return o;}catch(e){}
+    // Offline snapshot defaults (Oct 15): A1 Approved/sent, A2 handled by Rob
+    return {A1:'Approved',A2:'Changes'};}
   function setAppr(o){try{localStorage.setItem(AK,JSON.stringify(o));}catch(e){}}
   function renderAppr(){
     var a=getAppr(), open=0, html='';
@@ -581,7 +588,7 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   // ---- Crew ----
   var crew = [
     {n:'Head Honcho', lane:'Ops · Copilot · briefs', light:'l-blue', s:'prog', d:'Coordinator: board, Rob\'s Copilot, PRs, routines, scheduling, permits, follow-ups.', need:'Coding usage reset / on-demand for blocked PRs (#18 bug fixes, read-only key). Rob picks visit times.'},
-    {n:'Marketeer', lane:'GBP · reviews · Thumbtack', light:'l-amber', s:'wait', d:'Lead replies, review requests, GBP edits, LSA plan (no spend).', need:'GBP sign-in, review link, OK on review text, Thumbtack reconnect.'},
+    {n:'Marketeer', lane:'GBP · reviews · Thumbtack', light:'l-amber', s:'wait', d:'Lead replies, review requests, GBP edits, LSA plan (no spend).', need:'GBP remaining (dead website link + hide home address), Thumbtack reconnect.'},
     {n:'SEO & AEO Desk', lane:'Site content · FAQ', light:'l-amber', s:'wait', d:'Website and AI-search content: FAQ, consistent prices, weekly digest.', need:'Rob decides what the panel price includes.'},
     {n:'Video Creation Expert', lane:'Job videos', light:'l-amber', s:'wait', d:'Short before/after job videos with captions. No customer faces or addresses.', need:'Rob\'s input on video captions.'},
     {n:'Money Man', lane:'Finance · no cash alerts', light:'l-amber', s:'wait', d:'Read-only Chase, sorting, invoice drafts. Never moves money.', need:'Personal vs. business tagging; connect or list non-Chase cards.'},
@@ -614,18 +621,12 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
     document.getElementById('date').textContent=fmtD.format(now)+' · ET';
     var ymd=p.year+'-'+p.month+'-'+p.day;
     var mins=(+p.hour)*60+(+p.minute), secs=mins*60+(+p.second);
-    document.getElementById('todayLabel').textContent=(ymd==='2026-10-14'?'Today · ':'')+p.weekday+' '+p.month+'/'+p.day;
+    document.getElementById('todayLabel').textContent=(ymd==='2026-10-15'?'Today · ':'')+p.weekday+' '+p.month+'/'+p.day;
 
-    // Capitalize call: Wed Oct 14 2026 10:20 AM ET
+    // Capitalize / Empower: missed Wed Oct 14 — needs reschedule
     var cd=document.getElementById('callCountdown'), cc=document.getElementById('callChip');
-    var callSecs=10*3600+20*60;
-    if(ymd<'2026-10-14'){cd.textContent='Coming up Wed Oct 14';cc.className='chip s-not';cc.textContent='Scheduled';}
-    else if(ymd==='2026-10-14' && secs<callSecs){
-      var r=callSecs-secs, h=Math.floor(r/3600), m=Math.floor(r%3600/60), s=r%60;
-      cd.textContent='T−'+(h?h+'h ':'')+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
-      cc.className='chip '+(r<=1800?'s-wait':'s-not'); cc.textContent=r<=1800?'Starting soon':'Today';
-    } else if(ymd==='2026-10-14' && secs<callSecs+3600){cd.textContent='On the call now (est.)';cc.className='chip s-prog';cc.textContent='In progress';}
-    else {cd.textContent='Call time passed. Log the outcome.';cc.className='chip s-done';cc.textContent='Time passed';}
+    cd.textContent='Missed Oct 14 · reschedule Mon–Fri 9–6 ET or in Robinhood';
+    cc.className='chip s-wait'; cc.textContent='Reschedule';
 
     // Rhythm: highlight the next routine
     var dow=DOW[p.weekday], next;
@@ -649,12 +650,15 @@ footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:cent
   var MC=window.MC; if(!MC) return; var esc=MC.esc, $=MC.$;
   // Offline snapshot of Board rows (first names only, no addresses/phones/money), same shape as the live 'state' action.
   var SNAP={board:[
-    {row:2,item:'Timothy estimate follow-up (overdue)',area:'Estimating',owner:'Head Honcho',status:'Waiting on Rob',next:'Rob OKs a check-in text draft',due:'',updated:''},
-    {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Rob confirmed 2 PM; fix time in Copilot app',due:'2026-10-15',updated:'2026-10-14'},
+    {row:2,item:'Timothy estimate follow-up',area:'Estimating',owner:'Head Honcho',status:'Done',next:'Rob handled check-in',due:'',updated:'2026-10-14'},
+    {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Confirmed 2 PM; Copilot may still show 2 AM',due:'2026-10-15',updated:'2026-10-14'},
     {row:4,item:'Schedule estimate visit: Mike (kitchen switch, Centereach)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:'2026-10-14'},
     {row:5,item:'Schedule estimate visit: Luann (Ring doorbell + camera, Syosset)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
-    {row:6,item:'Phil (Wading River) won: convert to job',area:'Jobs',owner:'Head Honcho',status:'Not started',next:'Set up job in app (lighting)',due:'',updated:''},
-    {row:7,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Visit; send notes after for draft estimate',due:'2026-10-15',updated:''}
+    {row:6,item:'Schedule estimate visit: Matt',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
+    {row:7,item:'Schedule estimate visit: Adnan',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
+    {row:8,item:'Schedule estimate visit: Susan',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
+    {row:9,item:'Phil (Wading River) won: convert to job',area:'Jobs',owner:'Head Honcho',status:'Not started',next:'Set up job in app (lighting)',due:'',updated:''},
+    {row:10,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Visit today; confirm text sent; notes after for draft estimate',due:'2026-10-15',updated:'2026-10-15'}
   ]};
   MC.snap=SNAP;
   function data(){return MC.last||SNAP;}
