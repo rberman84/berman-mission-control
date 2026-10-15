@@ -1,0 +1,315 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Mission">
+<meta name="theme-color" content="#0b0d10"><meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Mission Control</title>
+<style>
+:root{--bg:#0b0d10;--card:#14181d;--line:#222830;--tx:#e9eef2;--dim:#8a949e;--ac:#7fe3c4;--amb:#f2c46d;--red:#ef7d7d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif}
+body{padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 74px);max-width:520px;margin:0 auto}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.top{display:flex;align-items:center;gap:14px}
+.ring{position:relative;width:64px;height:64px;flex:none}.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:600}
+.next{flex:1;min-width:0}.next small{color:var(--dim);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.next div{font-size:17px;font-weight:600;margin-top:2px}
+.gear{width:44px;height:44px;border-radius:12px;color:var(--dim);font-size:20px}
+.live{font-size:12px;color:var(--dim);margin:2px 0 0 78px}.live.on{color:var(--ac)}
+h2{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin:12px 2px 7px;display:flex;justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;transition:transform .2s,opacity .3s;touch-action:pan-y}
+.card .t{font-weight:600}.card .d{color:var(--dim);font-size:13px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;gap:8px;margin-top:10px}
+.nc{display:flex;align-items:center;gap:8px}.nc .tx{flex:1;min-width:0}.nc .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc .acts{margin:0;flex:none}.nc .acts button{flex:none;width:44px;padding:0}.nc .acts .pri{width:auto;padding:0 14px}
+.acts button{flex:1;min-height:44px;border-radius:12px;background:#1d232a;font-weight:600;font-size:15px}
+.acts .pri{background:var(--ac);color:#06231b}
+.card.ok{border-color:rgba(127,227,196,.5)}.card.ok .okm{color:var(--ac);font-size:14px;margin-top:8px}
+.note{width:100%;margin-top:10px;background:#0f1216;border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:10px;min-height:44px}
+.empty{color:var(--dim);font-size:15px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:16px}
+.bots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bot{display:flex;flex-direction:column;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 8px;min-height:60px;min-width:0;text-decoration:none;color:var(--tx)}
+.bot b{font-size:13px;font-weight:600;line-height:1.15}.bot span{font-size:11px;color:var(--dim);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.g{background:var(--ac)}.a{background:var(--amb)}.r{background:var(--red)}.n{background:#4a535c}
+.stop{display:flex;align-items:center;gap:6px}.stop .who{flex:1;min-width:0}.stop .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stop .who b em{font-style:normal;color:var(--ac);margin-right:6px}
+.stop .who span{display:block;color:var(--dim);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{width:42px;height:44px;border-radius:12px;background:#1d232a;font-size:17px;flex:none}.ib.go{background:var(--ac);color:#06231b;width:56px;font-weight:700;font-size:15px}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:8px;max-width:520px;margin:0 auto}
+.bar input{flex:1;min-height:50px;border-radius:25px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;padding:0 18px;font-size:16px}
+.bar button{width:50px;height:50px;border-radius:25px;background:var(--card);border:1px solid var(--line);font-size:18px}.bar .send{background:var(--ac);color:#06231b;border:0}
+.more{display:block;width:100%;min-height:44px;margin-top:10px;border-radius:14px;border:1px solid var(--line);color:var(--dim);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 80px);transform:translateX(-50%);background:#20262d;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9}.sheet.on{display:block}
+.sheet>div{position:absolute;left:0;right:0;bottom:0;max-height:86vh;overflow:auto;background:#101317;border-radius:22px 22px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom) + 20px);max-width:520px;margin:0 auto}
+.grab{width:40px;height:5px;border-radius:3px;background:#333b44;margin:4px auto 10px}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kv div{background:var(--card);border-radius:12px;padding:10px;text-align:center}
+.kv b{display:block;font-size:20px}.kv span{font-size:11px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line);font-size:15px}.row span{color:var(--dim)}
+a.lnk{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;background:var(--card);border-radius:12px;margin-bottom:8px;color:var(--tx);text-decoration:none}
+label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:0 12px}
+</style></head><body>
+<div class="top">
+  <div class="ring"><svg width="64" height="64"><circle cx="32" cy="32" r="27" stroke="#1d232a" stroke-width="6" fill="none"/><circle id="arc" cx="32" cy="32" r="27" stroke="#7fe3c4" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/></svg><b id="score">–</b></div>
+  <div class="next"><small>Next move</small><div id="nextLine">Loading…</div></div>
+  <button class="gear" id="gear" aria-label="Settings">⚙︎</button>
+</div>
+<div class="live" id="live">● Offline snapshot</div>
+
+<h2><span>Needs you</span><span id="needCnt"></span></h2>
+<div id="needs"></div>
+
+<h2><span>Today</span><span id="dayLbl"></span></h2>
+<div id="today"></div>
+
+<h2><span>Your bots</span></h2>
+<div class="bots" id="bots"></div>
+
+<button class="more" id="moreBtn">More ▾</button>
+
+<form class="bar" id="bar" autocomplete="off">
+  <input id="cmd" placeholder="Tell your bots… (@seo, @money)" enterkeyhint="send">
+  <button type="button" id="mic" aria-label="Dictate">🎙</button>
+  <button class="send" aria-label="Send">↑</button>
+</form>
+<div class="toast" id="toast"></div>
+
+<div class="sheet" id="sheet"><div>
+  <div class="grab"></div>
+  <h2 style="margin-top:4px"><span>This week</span></h2>
+  <div class="kv" id="nums"></div>
+  <h2><span>Pipeline</span></h2><div id="pipe"></div>
+  <h2><span>More waiting</span></h2><div id="overflow"></div>
+  <h2><span>Weekly reset</span></h2>
+  <div class="card"><div class="d" style="-webkit-line-clamp:unset">Set your top 3 for the week. Sends to Head Honcho.</div>
+    <input class="in" id="t1" placeholder="1."><input class="in" id="t2" placeholder="2."><input class="in" id="t3" placeholder="3.">
+    <div class="acts"><button class="pri" id="sendTop">Send top 3</button></div></div>
+  <h2><span>Apps</span></h2>
+  <a class="lnk" href="https://admin.rbermanelectric.com">Copilot app<span>↗</span></a>
+  <a class="lnk" href="../">Classic Mission Control<span>↗</span></a>
+  <h2><span>Ops Board link</span><span id="connState"></span></h2>
+  <label>Script URL</label><input class="in" id="suUrl" placeholder="https://script.google.com/macros/s/…/exec">
+  <label>PIN</label><input class="in" id="suPin" type="password" inputmode="numeric">
+  <div class="acts"><button class="pri" id="suSave">Connect</button><button id="suClear">Disconnect</button></div>
+  <button class="more" id="closeSheet">Close</button>
+</div></div>
+<script>
+(function(){
+'use strict';
+var $=function(i){return document.getElementById(i);};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
+function nyParts(d){var o={};new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).forEach(function(p){o[p.type]=p.value;});if(o.hour==='24')o.hour='00';return o;}
+function ymd(d){var p=nyParts(d);return p.year+'-'+p.month+'-'+p.day;}
+
+// ---- Ops Board bridge (same localStorage key as v1, so the phone stays connected) ----
+var CK='bermanMC.conn.v1';
+function conn(){try{return JSON.parse(localStorage.getItem(CK))||null;}catch(e){return null;}}
+function api(body){var c=conn();if(!c)return Promise.reject(new Error('not connected'));body.pin=c.pin;
+  return fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
+   .then(function(r){return r.json();}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
+
+// ---- Bots ----
+var CHAT='grokbot://app/v1/agent?id=';
+var BOTS=[
+ {n:'Head Honcho',k:['head','honcho','hh'],own:/head honcho/i,link:'grokbot://app/v1'},
+ {n:'Marketeer',k:['marketeer','mkt','marketing'],own:/marketeer/i,id:'c89a669a-fb80-4b52-b2da-09e4082c8fe1'},
+ {n:'SEO & AEO',full:'SEO & AEO Desk',k:['seo','aeo'],own:/seo|aeo/i,id:'eea56f19-f007-4ef2-b739-42f87b1f0a01'},
+ {n:'Money Man',k:['money','mm','finance'],own:/money/i,id:'31c31f89-9815-4682-abcb-5fe79899dcd4'},
+ {n:'Video',full:'Video Creation Expert',k:['video'],own:/video/i,id:'b255c7ec-d31b-4256-9a17-feb358f3b1a1'},
+ {n:'Music',full:'Music Maker',k:['music'],own:/music/i,id:'7bd8d175-8c10-4064-8b4b-24ca838d3ccd'},
+ {n:'Diy Machine',k:['diy'],own:/diy/i,id:'b2436a77-9581-4fa3-8310-7edaa951ed53'}
+];
+
+// ---- Snapshot fallback (first names only, no addresses/phones/money) ----
+var SNAP={board:[
+ {row:2,item:'Abhik new lead: fan install',area:'Leads',owner:'Marketeer',status:'Waiting on Rob',next:'OK a reply draft',due:'',updated:''},
+ {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job today',due:'2026-10-15',updated:''},
+ {row:4,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Send notes after for draft estimate',due:'2026-10-15',updated:''}
+],approvals:[]};
+var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
+
+function stKey(x){x=String(x||'').toLowerCase();return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
+function rows(){return (S.board||[]).filter(function(r){return r.item;});}
+
+// ---- Needs you: approvals first, then rows waiting on Rob ----
+function needs(){
+  var a=(S.approvals||[]).map(function(x){return {id:'A:'+x.id,kind:'appr',aid:x.id,t:x.title||x.id,d:x.draft||x.type||'',who:'Head Honcho'};});
+  var w=rows().filter(function(r){return stKey(r.status)==='wait'&&!/^APPROVAL /.test(r.item);})
+    .map(function(r){return {id:'R:'+r.row,kind:'row',row:r.row,item:r.item,t:r.item,d:r.next||'',who:r.owner||'Head Honcho'};});
+  return a.concat(w);
+}
+function cardHtml(x){
+  var L=local[x.id];
+  if(L) return '<div class="card ok" data-id="'+esc(x.id)+'"><div class="t">'+esc(x.t)+'</div><div class="okm">✓ '+esc(L)+'</div></div>';
+  return '<div class="card nc" data-id="'+esc(x.id)+'"><div class="tx"><div class="t">'+esc(x.t)+'</div>'+(x.d?'<div class="d">'+esc(x.d)+'</div>':'')+'</div>'+
+   '<div class="acts"><button data-a="note" aria-label="Note">✎</button><button class="pri" data-a="ok">'+(x.kind==='appr'?'Approve':'Done')+'</button></div></div>';
+}
+function renderNeeds(){
+  var N=needs(), open=N.filter(function(x){return !local[x.id];});
+  var top=N.slice(0,3);
+  $('needs').innerHTML=top.length?top.map(cardHtml).join(''):'<div class="empty">Nothing needs you. The crew is running.</div>';
+  $('needCnt').textContent=open.length?open.length+' open':'';
+  $('overflow').innerHTML=N.length>3?N.slice(3).map(cardHtml).join(''):'<div class="empty">Nothing else waiting.</div>';
+}
+function find(id){return needs().filter(function(x){return x.id===id;})[0];}
+function act(x,note){
+  var p;
+  if(x.kind==='appr'){
+    p=api({action:'approve',id:x.aid,status:note?'Changes':'Approved',note:note||''}).then(function(){return note?'Note sent. Head Honcho will revise.':'Approved. Head Honcho takes the next step; nothing is sent without you.';});
+  } else if(note){
+    p=api({action:'ask',bot:x.who.split('/')[0].trim()||'Head Honcho',question:'[Re: '+x.item+'] '+note}).then(function(){return 'Note sent to '+(x.who||'Head Honcho')+'.';});
+  } else {
+    p=api({action:'done',item:x.item,row:x.row}).then(function(){return 'Marked done on the board.';});
+  }
+  return p.then(function(m){local[x.id]=m;render();toast('✓ Saved');refreshSoon();})
+   .catch(function(e){toast(/not connected/.test(e.message)?'Connect your Ops Board link in ⚙︎':'Didn\'t save: '+e.message);});
+}
+function onCardClick(e){
+  var b=e.target.closest('button[data-a]');if(!b)return;var c=b.closest('.card'),x=find(c.dataset.id);if(!x)return;
+  if(b.dataset.a==='ok') return act(x);
+  if(b.dataset.a==='note'){var t=c.querySelector('textarea');
+    if(!t){c.classList.remove('nc');t=document.createElement('textarea');t.className='note';t.placeholder='Your note…';c.insertBefore(t,c.querySelector('.acts'));b.textContent='Send note';b.className='pri';b.style.flex='1';t.focus();return;}
+    if(t.value.trim()) act(x,t.value.trim());}
+}
+$('needs').addEventListener('click',onCardClick);$('overflow').addEventListener('click',onCardClick);
+// Swipe right on a card = Approve / Done
+(function(){var sx=0,el=null;
+ $('needs').addEventListener('touchstart',function(e){el=e.target.closest('.card');sx=e.touches[0].clientX;},{passive:true});
+ $('needs').addEventListener('touchmove',function(e){if(!el)return;var dx=e.touches[0].clientX-sx;if(dx>0)el.style.transform='translateX('+Math.min(dx,120)+'px)';},{passive:true});
+ $('needs').addEventListener('touchend',function(e){if(!el)return;var dx=e.changedTouches[0].clientX-sx;el.style.transform='';var x=find(el.dataset.id);if(dx>100&&x&&!local[x.id])act(x);el=null;});
+})();
+
+// ---- Score + single next action ----
+function score(){
+  var b={done:0,prog:0,wait:0,block:0,not:0},today=0,d=ymd(new Date());
+  rows().forEach(function(r){var k=stKey(r.status);b[k]++;if(k==='done'&&String(r.updated).indexOf(d)===0)today++;});
+  var tot=b.done+b.prog+b.wait+b.block+b.not||1;
+  today+=Object.keys(local).length;
+  return Math.max(0,Math.min(100,Math.round((b.done+.5*b.prog+.25*b.not)/tot*100+5*today)));
+}
+function nextLine(st){
+  var N=needs().filter(function(x){return !local[x.id];});
+  if(N.length) return N[0].kind==='appr'?'Approve: '+N[0].t:N[0].t;
+  if(st[0]) return st[0].name+' at '+st[0].time+(st[0].town?', '+st[0].town:'');
+  return 'You\'re clear. Tell a bot what\'s next.';
+}
+
+// ---- Today: next 2 appointments ----
+var TOWNS=['Lake Ronkonkoma','Ronkonkoma','Islandia','East Setauket','Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset'];
+var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;});return best;}
+function stopOf(r){
+  var t=String(r.item||'')+' '+String(r.next||''),low=t.toLowerCase();
+  if(!/visit|job|appointment|install|service call|walkthrough/.test(low)||/^schedule /i.test(r.item)||stKey(r.status)==='done'&&!/job/.test(low))return null;
+  var tm=String(r.item).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i)||t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i);if(!tm)return null;
+  var date=/^\d{4}-\d{2}-\d{2}/.test(r.due)?r.due.slice(0,10):'';
+  var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
+  if(!date&&dm)date=nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');
+  if(!date)return null;
+  var h=+tm[1]%12+(/pm/i.test(tm[3])?12:0),m=+(tm[2]||0);
+  var kind=/estimate/.test(low)?'Estimate':/job|install/.test(low)?'Job':'Visit';
+  var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|fan|outlet)/i)||[])[1]||'';
+  return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:h*60+m,
+    time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():'')};
+}
+function stops(){
+  var now=new Date(),td=ymd(now),tm=ymd(new Date(now.getTime()+864e5)),p=nyParts(now),nowM=+p.hour*60+ +p.minute;
+  return rows().map(stopOf).filter(function(x){return x&&(x.date===tm||x.date===td&&x.mins+90>=nowM);})
+   .sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;}).slice(0,2)
+   .map(function(x){x.day=x.date===td?'':'Tmrw ';return x;});
+}
+var STOPS=[];
+function renderToday(){
+  STOPS=stops();
+  $('dayLbl').textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}).format(new Date());
+  $('today').innerHTML=STOPS.length?STOPS.map(function(x,i){
+    return '<div class="card stop" data-i="'+i+'"><div class="who"><b><em>'+esc(x.day+x.time)+'</em>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
+     '<button class="ib" data-a="call" aria-label="Call">📞</button><button class="ib" data-a="sms" aria-label="Text">💬</button><button class="ib" data-a="cal" aria-label="Add to Calendar">📅</button><button class="ib go" data-a="go">Go</button></div>';
+  }).join(''):'<div class="empty">Open road. Nothing booked next.</div>';
+}
+function go(url){window.location.href=url;}
+$('today').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-a]');if(!b)return;var x=STOPS[+b.closest('.stop').dataset.i];if(!x)return;var a=b.dataset.a;
+  if(a==='go'){
+    var fb=function(why){toast(why);go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY'));};
+    if(!conn())return fb('Town only. Connect ⚙︎ for exact address.');
+    api({action:'address',row:x.row,item:x.item}).then(function(j){go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address));}).catch(function(err){fb('Town only ('+err.message+')');});
+  } else if(a==='call'||a==='sms'){
+    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
+    api({action:'phone',row:x.row,item:x.item}).then(function(j){go((a==='call'?'tel:':'sms:')+String(j.phone).replace(/[^\d+]/g,''));})
+     .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':'No number: '+err.message);});
+  } else if(a==='cal'){
+    var p=function(n){return String(n).padStart(2,'0');},d=x.date.replace(/-/g,''),st=d+'T'+p(x.h)+p(x.m)+'00',eh=x.h+1;
+    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berman//MC//EN','BEGIN:VEVENT','UID:mc-'+x.row+'-'+d+'@berman','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
+      'DTSTART;TZID=America/New_York:'+st,'DTEND;TZID=America/New_York:'+d+'T'+p(eh)+p(x.m)+'00','SUMMARY:'+x.name+' · '+x.kind,'LOCATION:'+(x.town?x.town+', NY':''),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    var u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})),l=document.createElement('a');l.href=u;l.download=x.name+'.ics';document.body.appendChild(l);l.click();l.remove();
+  }
+});
+
+// ---- Bot tiles ----
+function renderBots(){
+  var R=rows();
+  $('bots').innerHTML=BOTS.map(function(b){
+    var mine=R.filter(function(r){return b.own.test(r.owner||'')&&stKey(r.status)!=='done';});
+    var w=mine.filter(function(r){return stKey(r.status)==='wait';}).length,bl=mine.filter(function(r){return stKey(r.status)==='block';}).length,pr=mine.filter(function(r){return stKey(r.status)==='prog';}).length;
+    var dot=bl?'r':w?'a':mine.length?'g':'n',line=bl?'Blocked':w?'Needs you':pr?'Working':mine.length?mine.length+' queued':'Idle';
+    return '<a class="bot" href="'+(b.link||CHAT+b.id)+'"><b>'+esc(b.n)+'</b><span><i class="dot '+dot+'"></i>'+esc(line)+'</span></a>';
+  }).join('')+'<a class="bot" href="https://admin.rbermanelectric.com"><b>Copilot</b><span>Open app ↗</span></a>';
+}
+
+// ---- More sheet ----
+function renderMore(){
+  var R=rows(),wk=Date.now()-7*864e5,c={new:0,visit:0,est:0,won:0};
+  R.forEach(function(r){var l=String(r.item).toLowerCase();
+    if(/\bwon\b/.test(l))c.won++;else if(/estimate (follow|sent|out)/.test(l))c.est++;else if(/schedule (an )?(estimate )?visit|new lead/.test(l))c.new++;else if(/visit|walkthrough/.test(l))c.visit++;});
+  $('nums').innerHTML=[['New',c.new],['Visits',c.visit],['Estimates',c.est],['Won',c.won]].map(function(k){return '<div><b>'+k[1]+'</b><span>'+k[0]+'</span></div>';}).join('');
+  var L=R.filter(function(r){return /lead|visit|estimate|won|lost/i.test(r.item)&&stKey(r.status)!=='done';}).slice(0,8);
+  $('pipe').innerHTML=L.length?L.map(function(r){return '<div class="row">'+esc(String(r.item).replace(/^Schedule (an )?(estimate )?visit:\s*/i,'').split(/[(:,]/)[0].trim()||r.item)+'<span>'+esc(r.status)+'</span></div>';}).join(''):'<div class="empty">No open leads on the board.</div>';
+  var c0=conn();$('connState').textContent=c0?'connected':'not connected';
+}
+$('moreBtn').onclick=function(){renderMore();$('sheet').classList.add('on');};
+$('gear').onclick=function(){$('moreBtn').onclick();setTimeout(function(){$('suUrl').scrollIntoView({block:'center'});},50);};
+$('closeSheet').onclick=function(){$('sheet').classList.remove('on');};
+$('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))$('sheet').classList.remove('on');});
+$('sendTop').onclick=function(){var t=['t1','t2','t3'].map(function(i){return $(i).value.trim();}).filter(Boolean);if(!t.length)return toast('Add at least one');
+  api({action:'ask',bot:'Head Honcho',question:'[Weekly reset] Top 3: '+t.map(function(v,i){return (i+1)+') '+v;}).join(' ')}).then(function(){toast('✓ Top 3 sent');}).catch(function(e){toast(e.message);});};
+$('suSave').onclick=function(){var u=$('suUrl').value.trim(),p=$('suPin').value.trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u))return toast('URL must end with /exec');if(p.length<4)return toast('Enter your PIN');
+  localStorage.setItem(CK,JSON.stringify({url:u,pin:p}));api({action:'ping'}).then(function(){toast('✓ Connected');renderMore();refresh();}).catch(function(e){toast(e.message);});};
+$('suClear').onclick=function(){localStorage.removeItem(CK);renderMore();toast('Disconnected');};
+
+// ---- Command bar: sends to Inbox via 'ask', optional @bot routing ----
+function route(q){var m=q.match(/^@(\w+)\s*/);if(!m)return {bot:'Head Honcho',q:q};var k=m[1].toLowerCase();
+  var b=BOTS.filter(function(b){return b.k.indexOf(k)>=0||b.n.toLowerCase().indexOf(k)===0;})[0];return {bot:b?(b.full||b.n):'Head Honcho',q:q.slice(m[0].length)};}
+$('bar').onsubmit=function(e){e.preventDefault();var v=$('cmd').value.trim();if(!v)return;var r=route(v);
+  api({action:'ask',bot:r.bot,question:r.q}).then(function(){$('cmd').value='';$('cmd').blur();toast('✓ Sent to '+r.bot);refreshSoon();})
+   .catch(function(err){toast(/not connected/.test(err.message)?'Connect your Ops Board link in ⚙︎':'Not sent: '+err.message);});};
+$('mic').onclick=function(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){$('cmd').focus();return toast('Tap 🎤 on your keyboard to dictate');}
+  var r=new SR();r.lang='en-US';r.interimResults=false;r.onresult=function(e){$('cmd').value=e.results[0][0].transcript;};r.onerror=function(){toast('Mic unavailable, use keyboard 🎤');};r.start();toast('Listening…');};
+
+// ---- Render + live refresh ----
+function render(){
+  var sc=score(),col=sc>=80?'#7fe3c4':sc>=50?'#9fd3ff':'#f2c46d';
+  $('score').textContent=sc;$('arc').style.strokeDashoffset=(169.6*(1-sc/100)).toFixed(1);$('arc').style.stroke=col;
+  renderNeeds();renderToday();renderBots();$('nextLine').textContent=nextLine(STOPS);
+}
+var busy=false;
+function refresh(){
+  if(!conn()){render();return Promise.resolve();}
+  if(busy)return Promise.resolve();busy=true;
+  return api({action:'state'}).then(function(j){S=j;live=true;
+    var p=nyParts(new Date()),h=+p.hour;$('live').textContent='● Live · '+(h%12||12)+':'+p.minute+' '+(h>=12?'PM':'AM');$('live').className='live on';
+  }).catch(function(){$('live').textContent=live?'● Offline, last update shown':'● Offline snapshot';$('live').className='live';})
+   .then(function(){busy=false;render();});
+}
+var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
+render();refresh();
+setInterval(function(){if(!document.hidden)refresh();},60000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
+})();
+</script></body></html>
