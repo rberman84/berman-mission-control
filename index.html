@@ -107,7 +107,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <script>
 (function(){
 'use strict';
-var BUILD='2026-10-15g';
+var BUILD='2026-10-16a';
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
@@ -149,8 +149,10 @@ var BOTS=[
 
 // ---- Snapshot fallback (first names only, no addresses/phones/money) ----
 var SNAP={board:[
- {row:13,item:'Randall Thu job, 3 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Job 3 PM, Setauket',due:'2026-10-15',updated:''},
- {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Job 1:30 PM today, East Northport',due:'2026-10-15',updated:''}
+ {row:29,item:'Phil Fri job, 2 PM (Wading River)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job 2 PM today, Wading River (lighting). Tap Done after the job is finished.',due:'2026-10-16',updated:''},
+ {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Was yesterday. Tap Done if finished.',due:'2026-10-15',updated:''},
+ {row:27,item:'Google reviews: 35 at 5.0 (was 33 before blast)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
+ {row:30,item:'Timothy Wed job, 8 AM (East Islip)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Rewiring job Wed Oct 28, 8 AM to 4 PM',due:'2026-10-28',updated:''}
 ],approvals:[]};
 var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
 var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
