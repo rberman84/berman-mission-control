@@ -107,7 +107,7 @@ label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 
 <script>
 (function(){
 'use strict';
-var BUILD='2026-10-16b';
+var BUILD='2026-10-16c';
 var $=function(i){return document.getElementById(i);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
