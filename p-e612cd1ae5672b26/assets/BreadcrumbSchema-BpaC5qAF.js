@@ -1,0 +1,1 @@
+import{j as m}from"./query-Dv34lUIy.js";const a=({items:e})=>{const s={"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:e.map((t,r)=>({"@type":"ListItem",position:r+1,name:t.name,item:t.url}))};return m.jsx("script",{type:"application/ld+json",dangerouslySetInnerHTML:{__html:JSON.stringify(s)}})};export{a as B};

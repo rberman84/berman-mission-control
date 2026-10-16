@@ -1,0 +1,58 @@
+# Berman Electric LLC
+
+> Licensed electrician serving Suffolk County, Long Island, NY. Residential and commercial electrical services including EV charger installation, panel upgrades, lighting, rewiring, repairs, and emergency calls. Free estimates. Lifetime workmanship warranty.
+
+Berman Electric is a local, licensed electrical contractor based in Ronkonkoma, New York, owned and operated by Rob Berman. The company specializes in residential and small commercial electrical work across Suffolk County, Long Island. All work is backed by a lifetime workmanship warranty. Estimates are free and transparent.
+
+## Services
+
+- [Services](/services): Full list of electrical services offered, from EV chargers to full-home rewiring.
+- [EV Charger Installation](/services/ev-charger-installation): Level 2 EV charger installation for homes and businesses, including Tesla, ChargePoint, and universal options.
+- [EV Charger Installation — Long Island](/services/ev-charger-installation-long-island): EV charging solutions tailored for Long Island homeowners and HOAs.
+- [Panel Upgrades](/services/panel-upgrades): Electrical panel replacement and 200-amp upgrades for modern power demands.
+- [Panel Upgrades — Long Island](/services/panel-upgrades-long-island): 200-amp service upgrades across Suffolk and Nassau counties.
+- [Lighting Installation](/services/lighting-installation): Recessed, landscape, under-cabinet, and LED lighting design and install.
+- [Electrical Repairs](/services/electrical-repairs): Troubleshooting, outlet repair, circuit issues, and code corrections.
+- [Outlets & Switches](/services/outlets-switches): Installation, replacement, GFCI/AFCI upgrades, and smart switch setups.
+- [Home Rewiring](/services/home-rewiring): Whole-house and partial rewiring for safety, renovations, and code compliance.
+- [Emergency Electrical](/services/emergency-electrical): 24/7 emergency electrical service for Suffolk County residents.
+
+## Service Area
+
+- [Suffolk County Hub](/towns/suffolk-county): Overview of service coverage across Suffolk County, Long Island.
+- [Ronkonkoma](/towns/ronkonkoma): Local electrical services in Ronkonkoma, NY — home base of Berman Electric.
+- [Smithtown](/towns/smithtown): Electrician serving Smithtown, NY.
+- [Hauppauge](/towns/hauppauge): Electrician serving Hauppauge, NY.
+- [Commack](/towns/commack): Electrician serving Commack, NY.
+- [Holbrook](/towns/holbrook): Electrician serving Holbrook, NY.
+- [Patchogue](/towns/patchogue): Electrician serving Patchogue, NY.
+
+## Localized Landing Pages
+
+- [Electrical Panel Upgrade Ronkonkoma, NY](/electrical-panel-upgrade-ronkonkoma-ny): 200-amp panel upgrade services in Ronkonkoma.
+- [EV Charger Installation Ronkonkoma, NY](/ev-charger-installation-ronkonkoma-ny): Home EV charger installation in Ronkonkoma.
+- [Electrical Troubleshooting Ronkonkoma, NY](/electrical-troubleshooting-ronkonkoma-ny): Diagnostic and repair services in Ronkonkoma.
+- [Recessed Lighting Installation Ronkonkoma, NY](/recessed-lighting-installation-ronkonkoma-ny): Recessed and can lighting installation in Ronkonkoma.
+- [Outlets and Switches Ronkonkoma, NY](/outlets-and-switches-ronkonkoma-ny): Outlet and switch replacement in Ronkonkoma.
+- [Dedicated Circuit Installation Ronkonkoma, NY](/dedicated-circuit-installation-ronkonkoma-ny): Dedicated circuits for appliances and EV chargers in Ronkonkoma.
+
+## Resources
+
+- [Before You Buy](/before-you-buy): Honest guides to help homeowners plan electrical projects before committing.
+- [EV Charger Buying Guide](/before-you-buy/ev-charger): What to know before buying an EV charger for your home.
+- [200-Amp Upgrade Guide](/before-you-buy/200-amp-upgrade): When and why to upgrade to a 200-amp electrical panel.
+- [Recessed Lighting Guide](/before-you-buy/recessed-lighting): Planning recessed lighting for kitchens, living rooms, and basements.
+- [Basement Finishing Electrical](/before-you-buy/finishing-basement): Electrical requirements for finishing a basement.
+- [Landscape Lighting Guide](/before-you-buy/landscape-lighting): Outdoor lighting design and installation planning.
+- [Permits](/permits): Electrical permit requirements and processes in Suffolk County, NY.
+- [Reviews](/reviews): Customer reviews and testimonials from Suffolk County homeowners.
+
+## Blog
+
+- [Blog](/blog): Articles, tips, and local electrical news for Suffolk County homeowners.
+- [200-Amp Panel Upgrade Cost Long Island 2026](/blog/200-amp-panel-upgrade-cost-long-island-2026): Pricing breakdown for 200-amp panel upgrades on Long Island.
+
+## Optional
+
+- [Project Showcase](/projects/:slug): Past project galleries by project type. Representative examples only.
+- [EV Charger Detail](/ev-chargers/:slug): Individual EV charger product pages. Representative examples only.

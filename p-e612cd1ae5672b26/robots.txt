@@ -1,0 +1,30 @@
+# Berman Electric - Robots.txt
+# https://www.rbermanelectric.com
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /auth
+Disallow: /reset-password
+
+
+# Sitemap — auto-includes new blog posts and town pages (single canonical host)
+Sitemap: https://www.rbermanelectric.com/sitemap.xml
+
