@@ -1,802 +1,409 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#070b10">
-<title>Berman Electric · Mission Control</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Mission">
+<meta name="theme-color" content="#0b0d10"><meta name="robots" content="noindex">
+<link rel="manifest" href="../manifest.webmanifest"><link rel="icon" href="../icon-192.png"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache">
+<title>Mission Control</title>
 <style>
-:root{
-  --bg:#070b10; --panel:#0d141c; --panel2:#111b25; --line:#1d2a36;
-  --text:#d9e4ec; --dim:#8296a6; --teal:#2ee6c8; --teal-d:#0f5c51;
-  --amber:#ffb547; --amber-d:#5c3d0f; --red:#ff5d6c; --red-d:#5a1820;
-  --blue:#5fb3ff; --blue-d:#163b5c; --grey:#6b7b88; --grey-d:#22303b;
-  --green:#5ef08f; --green-d:#174a2b;
-  --mono: ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-  --sans: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{
-  background:var(--bg); color:var(--text); font-family:var(--sans); font-size:15px; line-height:1.4;
-  background-image:
-    linear-gradient(rgba(46,230,200,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(46,230,200,.045) 1px,transparent 1px),
-    radial-gradient(ellipse at top,rgba(46,230,200,.08),transparent 60%);
-  background-size:28px 28px,28px 28px,100% 100%;
-  background-attachment:fixed;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) 40px env(safe-area-inset-left);
-}
-a{color:var(--teal)}
-.wrap{max-width:1180px;margin:0 auto;padding:12px}
-/* Header */
-header.top{
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
-  padding:14px 16px;border:1px solid var(--line);border-radius:14px;
-  background:linear-gradient(180deg,rgba(17,27,37,.95),rgba(13,20,28,.95));
-  box-shadow:0 0 0 1px rgba(46,230,200,.06),0 10px 30px rgba(0,0,0,.4);
-}
-.brand{display:flex;align-items:center;gap:10px}
-.bolt{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
-  background:rgba(255,181,71,.12);border:1px solid rgba(255,181,71,.45);color:var(--amber);font-size:19px;
-  box-shadow:0 0 14px rgba(255,181,71,.25)}
-.brand h1{font-size:17px;margin:0;letter-spacing:.02em;font-weight:700}
-.brand h1 span{color:var(--teal);text-shadow:0 0 10px rgba(46,230,200,.45)}
-.brand small{display:block;color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-.clock{text-align:right;font-family:var(--mono)}
-.clock .t{font-size:26px;color:var(--teal);text-shadow:0 0 12px rgba(46,230,200,.5);letter-spacing:.04em}
-.clock .d{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
-/* Banner */
-.banner{margin:12px 0;padding:12px 14px;border-radius:12px;display:flex;align-items:center;gap:12px;
-  font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;border:1px solid}
-.banner .lamp{width:12px;height:12px;border-radius:50%;flex:none;animation:pulse 2s infinite}
-.banner.nominal{background:rgba(94,240,143,.07);border-color:rgba(94,240,143,.4);color:var(--green)}
-.banner.nominal .lamp{background:var(--green);box-shadow:0 0 10px var(--green)}
-.banner.needs{background:rgba(255,181,71,.08);border-color:rgba(255,181,71,.45);color:var(--amber)}
-.banner.needs .lamp{background:var(--amber);box-shadow:0 0 10px var(--amber)}
-.banner b{font-size:15px}
-.banner .sub{margin-left:auto;color:var(--dim);text-transform:none;letter-spacing:0;font-size:12px}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-/* Gauges */
-.gauges{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-.gauge{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.gauge .n{font-family:var(--mono);font-size:26px;font-weight:700}
-.gauge .l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
-.gauge.a .n{color:var(--amber)} .gauge.t .n{color:var(--teal)} .gauge.r .n{color:var(--red)} .gauge.b .n{color:var(--blue)}
-/* Sections */
-details.sec{background:rgba(13,20,28,.88);border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden}
-details.sec>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);
-  border-bottom:1px solid transparent;user-select:none}
-details.sec[open]>summary{border-bottom-color:var(--line)}
-details.sec>summary::-webkit-details-marker{display:none}
-summary .idx{color:var(--amber)}
-summary .cnt{margin-left:auto;color:var(--dim);letter-spacing:.04em}
-summary .chev{transition:transform .2s;color:var(--dim)}
-details.sec[open]>summary .chev{transform:rotate(90deg)}
-.body{padding:12px}
-.grid{display:grid;grid-template-columns:1fr;gap:10px}
-.card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 13px;position:relative}
-.card h3{margin:0 0 4px;font-size:15px;line-height:1.3}
-.card p{margin:4px 0 0;color:var(--dim);font-size:13.5px}
-.card .row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.card .meta{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.04em;margin-top:8px;text-transform:uppercase}
-.card.wait{border-left:3px solid var(--amber)}
-.card.done-local{opacity:.45}
-.card.done-local h3{text-decoration:line-through}
-/* Chips */
-.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
-  text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid;white-space:nowrap}
-.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}
-.s-done{color:var(--green);border-color:rgba(94,240,143,.4);background:var(--green-d)}
-.s-wait{color:var(--amber);border-color:rgba(255,181,71,.45);background:var(--amber-d)}
-.s-block{color:var(--red);border-color:rgba(255,93,108,.45);background:var(--red-d)}
-.s-prog{color:var(--blue);border-color:rgba(95,179,255,.45);background:var(--blue-d)}
-.s-not{color:#a9b6c0;border-color:rgba(169,182,192,.3);background:var(--grey-d)}
-.legend{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-/* Ops */
-.ops{display:grid;grid-template-columns:1fr;gap:10px}
-.countdown{font-family:var(--mono);font-size:22px;color:var(--amber);text-shadow:0 0 10px rgba(255,181,71,.35);margin-top:6px}
-.links{display:flex;flex-wrap:wrap;gap:8px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;text-decoration:none;
-  border:1px solid rgba(46,230,200,.35);background:rgba(46,230,200,.07);color:var(--teal);font-weight:600;font-size:14px;flex:1 1 140px;justify-content:center}
-.btn:hover,.btn:focus{background:rgba(46,230,200,.15);box-shadow:0 0 14px rgba(46,230,200,.2)}
-ul.tight{margin:6px 0 0;padding-left:18px;color:var(--dim);font-size:13.5px}
-ul.tight li{margin:3px 0}
-ul.tight b{color:var(--text);font-weight:600}
-/* Handled toggle */
-.tick{background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10.5px;
-  letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:8px;cursor:pointer;margin-top:10px}
-.tick:hover{color:var(--teal);border-color:rgba(46,230,200,.4)}
-.mini{font-size:12px;color:var(--dim);margin-top:10px}
-.mini button{background:none;border:none;color:var(--teal);cursor:pointer;font-size:12px;padding:0;text-decoration:underline}
-/* Bots */
-.bot .light{width:11px;height:11px;border-radius:50%;flex:none}
-.bot .name{display:flex;align-items:center;gap:9px}
-.l-green{background:var(--green);box-shadow:0 0 10px var(--green)}
-.l-amber{background:var(--amber);box-shadow:0 0 10px var(--amber);animation:pulse 2.4s infinite}
-.l-red{background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse 1.6s infinite}
-.l-grey{background:var(--grey)}
-.l-blue{background:var(--blue);box-shadow:0 0 10px var(--blue)}
-.bot .lane{font-family:var(--mono);font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-top:6px}
-.bot .need{margin-top:8px;font-size:13px;color:var(--text)}
-.bot .need span{color:var(--amber);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:2px}
-/* Pipeline */
-.pulse{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px}
-.stat .n{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--teal)}
-.stat .l{font-size:12px;color:var(--dim)}
-.stat .x{font-size:12.5px;margin-top:6px}
-/* Strips */
-.strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
-.strip .card{min-width:220px;flex:1 0 220px;scroll-snap-align:start}
-.when{font-family:var(--mono);font-size:18px;color:var(--amber)}
-.card.next{border-color:rgba(46,230,200,.55);box-shadow:0 0 16px rgba(46,230,200,.15)}
-.card.next::after{content:"NEXT UP";position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:.1em}
-.lesson .date{font-family:var(--mono);font-size:12px;color:var(--amber);letter-spacing:.06em}
-footer{color:var(--dim);font-size:11.5px;font-family:var(--mono);text-align:center;margin-top:18px;letter-spacing:.04em}
-/* Larger screens */
-@media (min-width:640px){
-  .grid{grid-template-columns:repeat(2,1fr)}
-  .gauges{grid-template-columns:repeat(4,1fr)}
-  .pulse{grid-template-columns:repeat(4,1fr)}
-  .ops{grid-template-columns:1.1fr 1fr 1fr}
-  .wrap{padding:18px}
-}
-@media (min-width:1000px){
-  .grid.g3{grid-template-columns:repeat(3,1fr)}
-  .grid.g4{grid-template-columns:repeat(4,1fr)}
-  .brand h1{font-size:20px}
-  .clock .t{font-size:32px}
-}
-@media (max-width:639px){.banner .sub{display:none}.clock{text-align:left}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
-#askQ,.modal input,#askBot{width:100%;box-sizing:border-box;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin:6px 0}
-.askrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal[hidden]{display:none}.modal .card{max-width:420px;width:100%}
-.tick.sync{color:var(--teal);border-color:rgba(46,230,200,.4)}.tick.err{color:var(--red)}
-.score{display:flex;align-items:center;gap:16px;margin:12px 0;padding:14px;border-radius:14px;border:1px solid rgba(46,230,200,.3);background:rgba(46,230,200,.05)}
-.ring{position:relative;width:118px;height:118px;flex:none}.ring svg{transform:rotate(-90deg)}
-.ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
-.ring .num b{font-size:34px;line-height:1}.ring .num small{font-size:10px;color:var(--dim);letter-spacing:.1em}
-.ring circle.fg{transition:stroke-dashoffset .8s ease,stroke .5s}
-.score h2{margin:0;font-size:16px}.score .hint{margin-top:6px;font-size:14px}.score .mix{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--dim)}
-.card.appr{border-left:3px solid var(--blue)}.appr pre{white-space:pre-wrap;font-family:inherit;font-size:14px;background:rgba(255,255,255,.04);padding:10px;border-radius:8px;margin:8px 0}
-.appr .acts{display:flex;gap:8px;flex-wrap:wrap}.appr .acts button{flex:1 1 120px;padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;border:1px solid rgba(46,230,200,.4);background:rgba(46,230,200,.1);color:var(--teal)}
-.appr .acts button.ed{border-color:rgba(255,181,71,.45);background:rgba(255,181,71,.08);color:var(--amber)}
-.appr textarea{width:100%;min-height:70px;margin-top:8px;border-radius:8px;background:#0b141b;color:var(--text);border:1px solid #2a3a46;padding:8px;font-size:15px}
-.appr .st{font-family:var(--mono);font-size:12px;margin-top:6px;color:var(--dim)}
-/* Lead pipeline */
-.kan{display:grid;grid-template-columns:repeat(4,minmax(200px,1fr));gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}
-.kcol{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:8px;scroll-snap-align:start;min-height:80px}
-.kcol h4{margin:0 0 6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between}
-.kcol h4 b{color:var(--text)}
-.lead{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;padding:9px 10px;margin:0 0 6px;color:var(--text);font:inherit;cursor:pointer;display:block}
-.lead .nm{font-weight:700}.lead .sb{font-size:12px;color:var(--dim)}
-.lead .nx{display:none;margin-top:6px;font-size:13px;color:var(--amber)}.lead.open .nx{display:block}
-.lead.open{box-shadow:0 0 14px rgba(46,230,200,.18);border-color:rgba(46,230,200,.5)}
-.kcol.c-new h4{color:var(--blue)}.kcol.c-visit h4{color:var(--amber)}.kcol.c-est h4{color:var(--teal)}.kcol.c-won h4{color:var(--green)}
-.c-new .lead{border-left-color:var(--blue)}.c-visit .lead{border-left-color:var(--amber)}.c-won .lead{border-left-color:var(--green)}.lead.lost{opacity:.55;border-left-color:var(--grey)}
-.kempty{font-size:12px;color:var(--dim);padding:6px}
-/* Route */
-.route{display:grid;gap:8px}
-.stop{display:flex;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
-.stop .tm{font-family:var(--mono);color:var(--amber);font-size:17px;min-width:64px;text-align:center}
-.stop .tm small{display:block;font-size:10px;color:var(--dim);letter-spacing:.08em}
-.stop .who{flex:1;min-width:0}.stop .who b{display:block}.stop .who span{font-size:12.5px;color:var(--dim)}
-.stop .nav{flex:none;padding:10px 12px;border-radius:10px;border:1px solid rgba(46,230,200,.45);background:rgba(46,230,200,.1);color:var(--teal);font-weight:700;cursor:pointer;font-size:14px}
-.dayh{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin:6px 0 0}
-/* Weekly reset */
-.wk label{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;margin:0 0 6px;background:var(--panel2);cursor:pointer;font-size:14.5px}
-.wk input[type=checkbox]{width:22px;height:22px;accent-color:var(--teal);flex:none}
-.wk label.on{border-color:rgba(94,240,143,.45);color:var(--green)}
-.wk .pick{width:100%;box-sizing:border-box;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;margin:4px 0}
-.wkbar{height:8px;border-radius:99px;background:var(--grey-d);overflow:hidden;margin:4px 0 10px}.wkbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
-#askMic.rec{color:var(--red);border-color:rgba(255,93,108,.6);animation:pulse 1.2s infinite}
-</style>
-</head>
-<body>
-<div class="wrap">
-
-<header class="top">
-  <div class="brand">
-    <div class="bolt" aria-hidden="true">⚡</div>
-    <div>
-      <h1>Berman Electric <span>· Mission Control</span></h1>
-      <small>Station: Ronkonkoma, NY · Ops crew online</small>
-    </div>
-  </div>
-  <div class="clock" aria-live="off">
-    <div class="t" id="clock">--:--:--</div>
-    <div class="d" id="date">America/New_York</div>
-  </div>
-</header>
-
-<div class="banner" id="banner" role="status">
-  <div class="lamp"></div>
-  <div id="bannerText">Checking systems…</div>
-  <div class="sub" id="bannerSub"></div>
+:root{--bg:#0b0d10;--card:#14181d;--line:#222830;--tx:#e9eef2;--dim:#8a949e;--ac:#7fe3c4;--amb:#f2c46d;--red:#ef7d7d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif}
+body{padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 74px);max-width:520px;margin:0 auto}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.top{display:flex;align-items:center;gap:14px}
+.ring{position:relative;width:64px;height:64px;flex:none}.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:600}
+.next{flex:1;min-width:0}.next small{color:var(--dim);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.next div{font-size:17px;font-weight:600;margin-top:2px}
+.gear{width:44px;height:44px;border-radius:12px;color:var(--dim);font-size:20px}
+.live{font-size:12px;color:var(--dim);margin:2px 0 0 78px}.live.on{color:var(--ac)}
+h2{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin:12px 2px 7px;display:flex;justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;transition:transform .2s,opacity .3s;touch-action:pan-y}
+.card .t{font-weight:600}.card .d{color:var(--dim);font-size:13px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;gap:8px;margin-top:10px}
+.nc{display:flex;align-items:center;gap:8px}.nc .tx{flex:1;min-width:0}.nc .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc .acts{margin:0;flex:none}.nc .acts button{flex:none;width:44px;padding:0}.nc .acts .pri{width:auto;padding:0 14px}
+.acts button{flex:1;min-height:44px;border-radius:12px;background:#1d232a;font-weight:600;font-size:15px}
+.acts .pri{background:var(--ac);color:#06231b}
+.card.ok{border-color:rgba(127,227,196,.5)}.card.ok .okm{color:var(--ac);font-size:14px;margin-top:8px}
+.note{width:100%;margin-top:10px;background:#0f1216;border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:10px;min-height:44px}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;background:var(--amb);color:#2a1d00;border-radius:6px;padding:2px 6px;margin-right:6px;vertical-align:2px}.age{color:var(--dim);font-weight:400;font-size:12px;margin-left:4px}
+.card.ok .acts{margin-top:8px}
+.empty{color:var(--dim);font-size:15px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:16px}
+.bots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bot{display:flex;flex-direction:column;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 8px;min-height:60px;min-width:0;text-decoration:none;color:var(--tx)}
+.bot b{font-size:13px;font-weight:600;line-height:1.15}.bot span{font-size:11px;color:var(--dim);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.g{background:var(--ac)}.a{background:var(--amb)}.r{background:var(--red)}.n{background:#4a535c}
+.stop{display:flex;align-items:center;gap:6px}.stop .who{flex:1;min-width:0}.stop .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stop .who b em{font-style:normal;color:var(--ac);margin-right:6px}
+.stop .who span{display:block;color:var(--dim);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{width:42px;height:44px;border-radius:12px;background:#1d232a;font-size:17px;flex:none}[hidden]{display:none!important}.ib.dn{background:#1d232a;color:var(--ac);width:auto;padding:0 10px;font-weight:700;font-size:14px}.okm2{color:var(--ac);font-size:13px;margin-top:6px}.stop.fin{border-color:rgba(127,227,196,.5);flex-wrap:wrap}.wk .row{padding:9px 2px}
+.ib.go{background:var(--ac);color:#06231b;width:56px;font-weight:700;font-size:15px}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:8px;max-width:520px;margin:0 auto}
+.bar input{flex:1;min-height:50px;border-radius:25px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;padding:0 18px;font-size:16px}
+.bar button{width:50px;height:50px;border-radius:25px;background:var(--card);border:1px solid var(--line);font-size:18px}.bar .send{background:var(--ac);color:#06231b;border:0}
+.more{display:block;width:100%;min-height:44px;margin-top:10px;border-radius:14px;border:1px solid var(--line);color:var(--dim);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 80px);transform:translateX(-50%);background:#20262d;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:50}
+.toast.on{opacity:1}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9}.sheet.on{display:block}body.lock{overflow:hidden}.xbtn{position:sticky;top:0;float:right;z-index:2;width:40px;height:40px;margin:-2px -6px 0 0;border-radius:20px;background:#2a3038;color:#fff;font-size:20px;line-height:40px;text-align:center;border:0}
+.sheet{overscroll-behavior:contain}.sheet>div{touch-action:pan-y;position:absolute;left:0;right:0;bottom:0;max-height:86vh;max-height:calc(90dvh - env(safe-area-inset-top));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;transition:transform .2s;background:#101317;border-radius:22px 22px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom) + 20px);max-width:520px;margin:0 auto}
+.grab{width:40px;height:5px;border-radius:3px;background:#333b44;margin:4px auto 10px}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kv div{background:var(--card);border-radius:12px;padding:10px;text-align:center}
+.kv b{display:block;font-size:20px}.kv span{font-size:11px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line);font-size:15px}.row span{color:var(--dim)}
+a.lnk{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;background:var(--card);border-radius:12px;margin-bottom:8px;color:var(--tx);text-decoration:none}
+label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:0 12px}
+</style></head><body>
+<div class="top">
+  <div class="ring"><svg width="64" height="64"><circle cx="32" cy="32" r="27" stroke="#1d232a" stroke-width="6" fill="none"/><circle id="arc" cx="32" cy="32" r="27" stroke="#7fe3c4" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/></svg><b id="score">–</b></div>
+  <div class="next"><small>Next move</small><div id="nextLine">Loading…</div></div>
+  <button class="gear" id="gear" aria-label="Settings">⚙︎</button>
 </div>
+<div class="live" id="live">● Offline snapshot</div>
 
-<div class="score" id="scoreBox">
-  <div class="ring"><svg width="118" height="118"><circle cx="59" cy="59" r="50" stroke="#1d2a33" stroke-width="12" fill="none"/>
-  <circle class="fg" id="scoreArc" cx="59" cy="59" r="50" stroke="#2ee6c8" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/></svg>
-  <div class="num"><b id="scoreNum">0</b><small>DAILY SCORE</small></div></div>
-  <div><h2 id="scoreTitle">How organized is today?</h2><div class="hint" id="scoreHint"></div><div class="mix" id="scoreMix"></div><div class="mix" id="liveTag" style="margin-top:4px">● Offline snapshot</div></div>
-</div>
+<h2><span>Needs you</span><span id="needCnt"></span></h2>
+<div id="needs"></div>
 
-<details class="sec" open id="apprSec">
-  <summary><span class="idx">✓</span> Approvals <span class="cnt" id="apprCnt"></span><span class="chev">›</span></summary>
-  <div class="body"><div class="grid" id="apprGrid"></div>
-  <p class="meta" style="margin-top:8px">Approving here only marks it OK on the board. Head Honcho gets customer texts ready; you send them yourself.</p></div>
-</details>
+<div id="wkTop" hidden><h2><span>This week</span></h2><div id="wkCard"></div></div>
 
-<div class="gauges">
-  <div class="gauge a"><div class="n" id="gWait">0</div><div class="l">Waiting on Rob</div></div>
-  <div class="gauge r"><div class="n" id="gBlock">3</div><div class="l">Blocked items</div></div>
-  <div class="gauge t"><div class="n">5</div><div class="l">Leads need visits</div></div>
-  <div class="gauge b"><div class="n">2</div><div class="l">Today's stops</div></div>
-</div>
+<h2><span>Today</span><span id="dayLbl"></span></h2>
+<div id="today"></div>
 
-<!-- 2. TODAY'S OPS -->
-<details class="sec" open>
-  <summary><span class="idx">01</span> Today's ops <span class="cnt" id="todayLabel"></span><span class="chev">›</span></summary>
-  <div class="body">
-    <div class="ops">
-      <div class="card" id="callCard">
-        <div class="row"><h3>Capitalize / Empower rollover</h3><span class="chip s-wait" id="callChip">Reschedule</span></div>
-        <p>Missed Wed Oct 14. Reschedule Mon–Fri 9–6 ET or in Robinhood. Head Honcho will remind once a new time is set.</p>
-        <div class="countdown" id="callCountdown">--</div>
-      </div>
-      <div class="card">
-        <div class="row"><h3>Rob's Copilot · schedule</h3><span class="chip s-wait">Needs Rob</span></div>
-        <ul class="tight">
-          <li><b>Loriana</b> 10 AM — solar estimate, Islandia (confirm text already sent).</li>
-          <li><b>Randall</b> 2 PM — job, Setauket (confirmed; Copilot may still show 2 AM).</li>
-          <li>Code PRs <b>blocked</b> until coding usage resets or on-demand is on. Netlify credits reset <b>Oct 29</b>.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Quick links</h3>
-        <div class="links" style="margin-top:8px">
-          <a class="btn" href="https://admin.rbermanelectric.com" target="_blank" rel="noopener">⚡ Rob's Copilot</a>
-          <a class="btn" href="https://docs.google.com/spreadsheets/d/1c0u52FYSjVeRquxUUTYsXyxJVbsprGYdEYouH-LcgqM/edit" target="_blank" rel="noopener">▦ Ops Board sheet</a>
-          <a class="btn" href="https://docs.google.com/spreadsheets/d/1sFyH5mX0QxAzScZkaZBebbGOybdJri93rMV9vxHAM1E/edit" target="_blank" rel="noopener">⌕ SEO ideas</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</details>
+<h2><span>Your bots</span></h2>
+<div class="bots" id="bots"></div>
 
-<!-- 3. WAITING ON ROB -->
-<details class="sec" open>
-  <summary><span class="idx">02</span> Waiting on Rob <span class="cnt" id="waitCnt"></span><span class="chev">›</span></summary>
-  <div class="body">
-    <div class="legend">
-      <span class="chip s-done">Done</span><span class="chip s-wait">Waiting on Rob</span><span class="chip s-block">Blocked</span><span class="chip s-prog">In progress</span><span class="chip s-not">Not started</span>
-    </div>
-    <div class="grid g4" id="waitGrid"></div>
-    <div class="card" style="margin-top:10px">
-      <h3 style="font-size:13px;color:var(--dim);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase">Also waiting on Rob (from the board)</h3>
-      <ul class="tight">
-        <li><b>Capitalize / Empower</b>: missed Oct 14 — reschedule Mon–Fri 9–6 ET or in Robinhood.</li>
-        <li><b>Video captions</b>: Video Creation Expert waiting on Rob.</li>
-        <li><b>Money Man</b>: connect or list the non-Chase cards.</li>
-        <li><b>Diy Machine</b>: define a lane or archive it.</li>
-      </ul>
-    </div>
-    <div class="mini" id="linkNote">Ops Board link: <b id="linkState">not connected</b>. Taps are saved on this phone only until you connect. <button id="openSetup">Connect</button> <button id="resetTicks">Reset</button></div>
-  </div>
-</details>
+<button class="more" id="moreBtn">More ▾</button>
 
+<form class="bar" id="bar" autocomplete="off">
+  <input id="cmd" placeholder="Tell your bots… (@seo, @money)" enterkeyhint="send">
+  <button type="button" id="mic" aria-label="Dictate">🎙</button>
+  <button class="send" aria-label="Send">↑</button>
+</form>
+<div class="toast" id="toast"></div>
 
-<!-- ASK A BOT -->
-<details class="sec" open>
-  <summary><span class="idx">✦</span> Ask a bot <span class="cnt" id="askCnt"></span><span class="chev">›</span></summary>
-  <div class="body"><div class="card">
-    <div class="askrow"><select id="askBot"><option>Head Honcho</option><option>Marketeer</option><option>Money Man</option><option>SEO &amp; AEO Desk</option><option>Video Creation Expert</option></select></div>
-    <textarea id="askQ" rows="3" placeholder="Type a question or task. Head Honcho picks it up and routes it."></textarea>
-    <div class="askrow"><button class="tick" id="askSend">➤ Send to crew</button> <button class="tick" id="askMic" aria-label="Speak your question">🎤 Talk</button> <span class="mini" id="askMsg"></span></div>
-  </div></div>
-</details>
-<div class="modal" id="setup" hidden><div class="card">
-  <h3>Connect Mission Control</h3>
-  <p class="mini">Paste the Web app URL from Apps Script and your PIN. They're saved on this phone only, never on the public page.</p>
-  <input id="suUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
-  <input id="suPin" type="password" placeholder="PIN" autocomplete="off">
-  <div class="askrow"><button class="tick" id="suSave">Save &amp; test</button> <button class="tick" id="suClear">Disconnect</button> <button class="tick" id="suClose">Close</button></div>
-  <div class="mini" id="suMsg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="sheetBox">
+  <button class="xbtn" id="xSheet" aria-label="Close">✕</button>
+  <div class="grab"></div>
+  <h2 style="margin-top:4px"><span>This week</span></h2>
+  <div class="kv" id="nums"></div>
+  <h2><span>Week plan</span></h2><div id="wkSheet"></div>
+  <h2><span>Pipeline</span></h2><div id="pipe"></div>
+  <h2><span>More waiting</span></h2><div id="overflow"></div>
+  <h2><span>Weekly reset</span></h2>
+  <div class="card"><div class="d" style="-webkit-line-clamp:unset">Set your top 3 for the week. Sends to Head Honcho.</div>
+    <input class="in" id="t1" placeholder="1."><input class="in" id="t2" placeholder="2."><input class="in" id="t3" placeholder="3.">
+    <div class="acts"><button class="pri" id="sendTop">Send top 3</button></div></div>
+  <h2><span>Apps</span></h2>
+  <a class="lnk" href="https://admin.rbermanelectric.com">Copilot app<span>↗</span></a>
+  <a class="lnk" href="../">Back to calm view<span>↗</span></a><a class="lnk" href="v1.html">Older Mission Control<span>↗</span></a>
+  <h2><span>Ops Board link</span><span id="connState"></span></h2>
+  <label>Script URL</label><input class="in" id="suUrl" placeholder="https://script.google.com/macros/s/…/exec">
+  <label>PIN</label><input class="in" id="suPin" type="password" inputmode="numeric">
+  <div class="acts"><button class="pri" id="suSave">Connect</button><button id="suClear">Disconnect</button></div>
+  <button class="more" id="closeSheet">Close</button>
 </div></div>
-
-<!-- 4. CREW ROSTER -->
-<details class="sec" open>
-  <summary><span class="idx">03</span> Crew roster <span class="cnt">7 bots</span><span class="chev">›</span></summary>
-  <div class="body"><div class="grid g4" id="crewGrid"></div></div>
-</details>
-
-<!-- 5. PIPELINE -->
-<details class="sec" open>
-  <summary><span class="idx">04</span> Pipeline pulse <span class="cnt">~564 leads in app</span><span class="chev">›</span></summary>
-  <div class="body">
-    <div class="pulse">
-      <div class="stat"><div class="n">5</div><div class="l">Leads needing estimate visits</div>
-        <div class="x">Mike (Centereach) · Luann (Syosset) · Matt · Adnan · Susan</div></div>
-      <div class="stat"><div class="n" style="color:var(--blue)">1</div><div class="l">Won, not yet a job</div>
-        <div class="x">Phil (Wading River): lighting. Set up the job in the app.</div></div>
-      <div class="stat"><div class="n" style="color:var(--green)">0</div><div class="l">Estimate past follow-up</div>
-        <div class="x">Timothy check-in: Done (Rob handled).</div></div>
-      <div class="stat"><div class="n" style="color:var(--amber)">Thu</div><div class="l">Oct 15 · today</div>
-        <div class="x"><b>10 AM</b> Loriana: solar estimate, Islandia (confirm sent).<br><b>2 PM</b> Randall: job, Setauket (confirmed).</div></div>
-    </div>
-    <div class="card" style="margin-top:10px">
-      <div class="row"><h3>Google reviews</h3><span class="chip s-done">34 · 5.0</span></div>
-      <p>Google Maps Oct 15: <b style="color:var(--text)">34</b> reviews at <b style="color:var(--text)">5.0</b> (was 33 before the Oct 14 blast). New overnight: Dominican (5★). Benchmark still ~150+. Review-request blast of 62 sent Oct 14.</p>
-    </div>
-  </div>
-</details>
-
-<!-- WEEKLY RESET -->
-<details class="sec" id="wkSec">
-  <summary><span class="idx">↻</span> Weekly reset <span class="cnt" id="wkCnt"></span><span class="chev">›</span></summary>
-  <div class="body wk"><div class="wkbar"><i id="wkBar" style="width:0"></i></div><div id="wkList"></div>
-    <div class="dayh" style="margin:10px 0 4px">Top 3 for the week</div>
-    <input class="pick" id="wkP1" maxlength="120" placeholder="1. Biggest needle-mover"><input class="pick" id="wkP2" maxlength="120" placeholder="2."><input class="pick" id="wkP3" maxlength="120" placeholder="3.">
-    <div class="askrow"><button class="tick" id="wkSave">➤ Lock in the week</button> <span class="mini" id="wkMsg"></span></div>
-    <p class="mini">Keep picks short and first names only. Saved to the Ops Board Inbox for Head Honcho.</p></div>
-</details>
-
-<!-- ROUTE -->
-<details class="sec" open id="routeSec">
-  <summary><span class="idx">➜</span> Today's route <span class="cnt" id="routeCnt"></span><span class="chev">›</span></summary>
-  <div class="body"><div class="route" id="route"></div>
-  <p class="mini" id="routeMsg" style="margin-top:6px">Addresses never live on this page. Navigate fetches it from your PIN-protected Ops Board link when you tap.</p></div>
-</details>
-
-<!-- BUSINESS NUMBERS -->
-<details class="sec" open id="numSec">
-  <summary><span class="idx">#</span> Business numbers <span class="cnt" id="numCnt">counts only</span><span class="chev">›</span></summary>
-  <div class="body"><div class="pulse" id="nums"></div>
-  <p class="mini" style="margin-top:6px">Counts from the Ops Board, this week (Mon–Sun). No dollars on this page.</p></div>
-</details>
-
-<!-- LEAD PIPELINE -->
-<details class="sec" open id="pipeSec">
-  <summary><span class="idx">⚑</span> Lead pipeline <span class="cnt" id="pipeCnt"></span><span class="chev">›</span></summary>
-  <div class="body"><div class="kan" id="kan"></div>
-  <p class="mini" style="margin-top:6px">Tap a lead to see its next move. Built from the Ops Board.</p></div>
-</details>
-
-<!-- 6. RHYTHM -->
-<details class="sec" open>
-  <summary><span class="idx">05</span> Rhythm <span class="cnt">ET</span><span class="chev">›</span></summary>
-  <div class="body">
-    <div class="strip" id="rhythm"></div>
-  </div>
-</details>
-
-<!-- 7. LESSONS -->
-<details class="sec">
-  <summary><span class="idx">06</span> Lessons log <span class="cnt">2 rules</span><span class="chev">›</span></summary>
-  <div class="body">
-    <div class="grid">
-      <div class="card lesson">
-        <div class="date">Oct 9 · hooks after early return</div>
-        <h3 style="margin-top:6px">React hooks placed after an early return crashed the estimate screen.</h3>
-        <p><b style="color:var(--teal)">Rule:</b> Lint check blocks hooks after early returns. Read the file fully before editing.</p>
-      </div>
-      <div class="card lesson">
-        <div class="date">Oct 13 · merge before reviewer comments</div>
-        <h3 style="margin-top:6px">PR #18 merged with open review findings (Lost leads in Active, stale lead overwrite).</h3>
-        <p><b style="color:var(--teal)">Rule:</b> Wait for reviewer comments and fix them before handing a PR to Rob.</p>
-      </div>
-    </div>
-  </div>
-</details>
-
-<footer>Board snapshot: Thu Oct 15, 2026 · Source: Live Operations Board + Berman Electric Operating System · Nothing goes to customers without Rob's OK.</footer>
-</div>
-
 <script>
 (function(){
-  var TZ = 'America/New_York';
-  var S = {done:['s-done','Done'], wait:['s-wait','Waiting on Rob'], block:['s-block','Blocked'], prog:['s-prog','In progress'], not:['s-not','Not started']};
-  function chip(k){return '<span class="chip '+S[k][0]+'">'+S[k][1]+'</span>';}
-  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+'use strict';
+var BUILD='2026-10-16b';
+var $=function(i){return document.getElementById(i);};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
+function nyParts(d){var o={};new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).forEach(function(p){o[p.type]=p.value;});if(o.hour==='24')o.hour='00';return o;}
+function ymd(d){var p=nyParts(d);return p.year+'-'+p.month+'-'+p.day;}
 
-  // ---- Waiting on Rob (big decisions) ----
-  var waiting = [
-    {id:'review', item:'Google review link + review text OK', t:'Google review link + review text OK', d:'Done. Blast of 62 sent Oct 14. Link live on GBP.', who:'Marketeer', s:'done'},
-    {id:'timothy', item:'Timothy estimate check-in', t:'Timothy check-in', d:'Done. Rob handled already.', who:'Head Honcho', s:'done'},
-    {id:'randall', item:'Randall Thu job time', t:'Randall: 2 PM confirmed', d:'Done. Rob confirmed 2 PM Setauket. Copilot may still show 2 AM — fix in app when coding is unblocked.', who:'Rob', s:'done'},
-    {id:'faq', item:'SEO FAQ / price cleanup', t:'FAQ / price fixes on the site', d:'Decide what the panel price includes so the site tells one consistent price story.', who:'SEO & AEO Desk', s:'wait'},
-    {id:'bills', item:'Money Man: personal vs. business bill tagging', t:'Personal vs. business bill tagging', d:'Confirm the unclear items so Money Man can sort the books. No cash alerts. Also: connect or list non-Chase cards.', who:'Money Man', s:'wait'},
-    {id:'visits', item:'Estimate-visit times (Mike, Luann, Matt, Adnan, Susan)', t:'Estimate-visit times', d:'Mike · Luann · Matt · Adnan · Susan. Head Honcho drafts times, Rob picks.', who:'Head Honcho', s:'not'},
-    {id:'sql', item:'Run 74-address SQL update in Lovable', t:'74-address SQL in Lovable', d:'Run the 74-address SQL update in Lovable.', who:'Rob', s:'wait'},
-    {id:'gbp', item:'Fix Google Business Profile remaining', t:'GBP remaining fixes', d:'Still need: fix dead website link, hide home address (service-area). Review link is done.', who:'Marketeer / Rob', s:'wait'},
-    {id:'thumb', item:'Reconnect Thumbtack messaging', t:'Reconnect Thumbtack', d:'Reconnect the messaging permission. This also unblocks intake-form auto-send.', who:'Rob', s:'wait'},
-    {id:'cap', item:'Capitalize / Empower rollover reschedule', t:'Capitalize / Empower reschedule', d:'Missed Oct 14 call. Reschedule Mon–Fri 9–6 ET or in Robinhood.', who:'Rob · Money Man', s:'wait'},
-    {id:'video', item:'Video captions input', t:'Video captions', d:'Video Creation Expert waiting on Rob\'s input on captions.', who:'Video Creation Expert', s:'wait'},
-    {id:'diy', item:'Diy Machine role', t:'Diy Machine role', d:'Define a lane or archive it. Does nothing until then.', who:'Rob', s:'not'}
-  ];
-  var KEY='bermanMC.handled.v1';
-  function getTicks(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
-  function setTicks(o){try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
-  function renderWaiting(){
-    var ticks=getTicks(), html='', open=0;
-    waiting.forEach(function(w){
-      var h=!!ticks[w.id] || w.s==='done'; if(!h) open++;
-      html+='<div class="card wait'+(h?' done-local':'')+'"><div class="row"><h3>'+esc(w.t)+'</h3>'+chip(w.s)+'</div>'+
-        '<p>'+esc(w.d)+'</p><div class="meta">Lane: '+esc(w.who)+'</div>'+
-        '<button class="tick" data-id="'+w.id+'">'+(h?'↺ Undo':'✓ Mark done')+'</button></div>';
-    });
-    document.getElementById('waitGrid').innerHTML=html;
-    document.getElementById('waitCnt').textContent=open+' of '+waiting.length+' open';
-    document.getElementById('gWait').textContent=open; if(typeof renderScore==='function'&&window.__mcReady) renderScore();
-    var b=document.getElementById('banner');
-    if(open>0){
-      b.className='banner needs';
-      document.getElementById('bannerText').innerHTML='<b>Needs Rob</b> · '+open+' decision'+(open>1?'s':'')+' waiting';
-      document.getElementById('bannerSub').textContent='Crew is standing by. Clear the amber cards below.';
-    } else {
-      b.className='banner nominal';
-      document.getElementById('bannerText').innerHTML='<b>Systems nominal</b> · nothing waiting on Rob';
-      document.getElementById('bannerSub').textContent='Crew is running on its own.';
-    }
-  }
-  // ---- Ops Board bridge (Apps Script). URL + PIN live only in this phone's localStorage. ----
-  var CK='bermanMC.conn.v1';
-  function conn(){try{return JSON.parse(localStorage.getItem(CK))||null;}catch(e){return null;}}
-  function $(i){return document.getElementById(i);}
-  function api(body){var c=conn(); if(!c) return Promise.reject(new Error('not connected'));
-    body.pin=c.pin;
-    return fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})
-      .then(function(r){return r.json();}).then(function(j){if(!j.ok) throw new Error(j.error||'failed'); return j;});}
-  function showConn(){var c=conn(); $('linkState').textContent=c?'connected':'not connected';
-    $('linkNote').firstChild.nodeValue='Ops Board link: ';
-    $('askMsg').textContent=c?'':'Not connected yet. Tap Connect above to send.';}
-  $('openSetup').onclick=function(){var c=conn()||{}; $('suUrl').value=c.url||''; $('suPin').value=''; $('suMsg').textContent=''; $('setup').hidden=false;};
-  $('suClose').onclick=function(){$('setup').hidden=true;};
-  $('suClear').onclick=function(){if(!confirm('Disconnect Mission Control from your board?'))return;localStorage.removeItem(CK); showConn(); $('suMsg').textContent='Disconnected.';};
-  $('suSave').onclick=function(){var u=$('suUrl').value.trim(), p=$('suPin').value.trim();
-    if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u)){ $('suMsg').textContent='That URL should start with https://script.google.com/macros/s/ and end with /exec'; return;}
-    if(!p){ $('suMsg').textContent='Enter your PIN.'; return;}
-    localStorage.setItem(CK,JSON.stringify({url:u,pin:p})); $('suMsg').textContent='Testing…';
-    api({action:'ping'}).then(function(){ $('suMsg').textContent='Connected ✓'; showConn(); refresh(); setTimeout(function(){$('setup').hidden=true;},800);})
-      .catch(function(e){ showConn(); $('suMsg').textContent='Could not connect: '+e.message;});};
-  $('waitGrid').addEventListener('click',function(e){
-    var btn=e.target.closest('.tick'); if(!btn) return;
-    var id=btn.dataset.id, w=waiting.filter(function(x){return x.id===id;})[0];
-    var t=getTicks(), undo=!!t[id]; t[id]=!undo; setTicks(t); renderWaiting();
-    if(!conn()) return;
-    var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b) b.textContent='… saving';
-    api({action:'done',item:w.item,row:w.row,undo:undo}).then(function(){refreshSoon();var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b){b.textContent=(undo?'✓ Mark done':'✓ Done on board'); b.classList.add('sync');}})
-      .catch(function(err){var b=$('waitGrid').querySelector('[data-id="'+id+'"]'); if(b){b.textContent='⚠ Not saved, tap to retry'; b.classList.add('err');} var t=getTicks(); t[id]=undo; setTicks(t);});
-  });
-  $('askSend').onclick=function(){var q=$('askQ').value.trim(); if(!q) return;
-    if(!conn()){ $('askMsg').textContent='Not connected yet. Tap Connect above.'; return;}
-    $('askMsg').textContent='Sending…';
-    api({action:'ask',question:q,bot:$('askBot').value}).then(function(){ refreshSoon(); $('askQ').value=''; $('askMsg').textContent='Sent ✓ Head Honcho will reply in chat.';})
-      .catch(function(e){ $('askMsg').textContent='Not sent: '+e.message;});};
+// ---- Ops Board bridge (same localStorage key as v1, so the phone stays connected) ----
+var CK='bermanMC.conn.v1';
+var DEFURL='https://script.google.com/macros/s/AKfycbzoPFbwX5PmnWAnU20oCdxXE_JZcLrXX5KTokAuokPCukl6ju7PGKb7UdspSbLI5AwSUQ/exec';
+function ckGet(){var m=/(?:^|; )mcpin=(\d+)/.exec(document.cookie);return m?m[1]:null;}
+function ckSet(p){try{document.cookie='mcpin='+p+'; max-age=315360000; path=/; secure; samesite=strict';}catch(e){}}
+function idbSet(p){try{var r=indexedDB.open('mc',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){r.result.transaction('kv','readwrite').objectStore('kv').put(p,'pin');};}catch(e){}}
+function idbGet(cb){try{var r=indexedDB.open('mc',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};r.onsuccess=function(){var q=r.result.transaction('kv').objectStore('kv').get('pin');q.onsuccess=function(){cb(q.result||null);};q.onerror=function(){cb(null);};};r.onerror=function(){cb(null);};}catch(e){cb(null);}}
+function saveConn(c){try{localStorage.setItem(CK,JSON.stringify(c));}catch(e){}if(c&&c.pin){ckSet(c.pin);idbSet(c.pin);}}
+function conn(){var c=null;try{c=JSON.parse(localStorage.getItem(CK));}catch(e){}
+  if(!c||!c.pin){var p=ckGet();if(p){c={url:DEFURL,pin:p};try{localStorage.setItem(CK,JSON.stringify(c));}catch(e){}}}
+  if(c&&!c.url)c.url=DEFURL;return c||null;}
+(function(){var c=conn();if(c&&c.pin){ckSet(c.pin);idbSet(c.pin);}else{idbGet(function(p){if(p){saveConn({url:DEFURL,pin:p});if(typeof refresh==='function')refresh();}});}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}})();
+(function(){var m=/[#&]k=(\d+)/.exec(location.hash||'');if(m){saveConn({url:DEFURL,pin:m[1]});history.replaceState(null,'',location.pathname);}})();
+function api(body){var c=conn();if(!c)return Promise.reject(new Error('not connected'));body.pin=c.pin;
+  var ac=window.AbortController?new AbortController():null;
+  var f=fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),cache:'no-store',signal:ac?ac.signal:undefined});
+  var to=new Promise(function(_,rej){setTimeout(function(){if(ac)ac.abort();rej(new Error('timed out'));},25000);});
+  return Promise.race([f,to])
+   .then(function(r){return r.text();}).then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('script not reachable');}return j;}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
 
-  // ---- Board snapshot (statuses from Ops Board, Oct 15) for the Daily Score ----
-  var board={done:7,prog:0,wait:6,block:3,not:7};
-  function scoreState(){
-    var t=getTicks(), a=getAppr(), b={done:board.done,prog:board.prog,wait:board.wait,block:board.block,not:board.not}, today=0;
-    waiting.forEach(function(w){ if(t[w.id]){ b.done++; if(w.s==='wait') b.wait--; else b.not--; today++; }});
-    approvals.forEach(function(x){ if(a[x.id] && x.boardWait){ b.done++; b.wait--; } if(a[x.id]) today++; });
-    var tot=b.done+b.prog+b.wait+b.block+b.not;
-    var base=(b.done+0.5*b.prog+0.25*b.not)/tot*100;
-    if(typeof SNAP_TODAY==='number') today+=SNAP_TODAY;
-    var sc=Math.min(100,Math.round(base+5*today));
-    return {sc:sc,b:b,today:today,tot:tot};
-  }
-  function renderScore(){
-    var st=scoreState(), sc=st.sc, col=sc>=80?'#5ef08f':sc>=50?'#2ee6c8':'#ffb547';
-    var arc=$('scoreArc'); arc.style.strokeDashoffset=(314.16*(1-sc/100)).toFixed(1); arc.style.stroke=col;
-    $('scoreNum').textContent=sc; $('scoreNum').style.color=col;
-    // how many more closes to hit next milestone (each close ≈ 100/tot + 5)
-    var goal=sc<50?50:sc<80?80:100, per=100/st.tot+5, need=Math.ceil((goal-sc)/per);
-    $('scoreTitle').textContent=sc>=80?'Dialed in 🔥':sc>=50?'Making moves ⚡':'Let\'s close some loops 🛠';
-    $('scoreHint').textContent=sc>=100?'Perfect day. Everything is moving.':'Clear '+need+' waiting item'+(need>1?'s':'')+' to hit '+goal+'.';
-    $('scoreMix').textContent=st.b.done+' done · '+st.b.wait+' waiting · '+st.b.block+' blocked · '+st.b.not+' not started · +'+st.today+' closed today';
-  }
+// ---- Bots ----
+var CHAT='grokbot://app/v1/agent?id=';
+var BOTS=[
+ {n:'Head Honcho',k:['head','honcho','hh'],own:/head honcho/i,link:'grokbot://app/v1'},
+ {n:'Marketeer',k:['marketeer','mkt','marketing'],own:/marketeer/i,id:'c89a669a-fb80-4b52-b2da-09e4082c8fe1'},
+ {n:'SEO & AEO',full:'SEO & AEO Desk',k:['seo','aeo'],own:/seo|aeo/i,id:'eea56f19-f007-4ef2-b739-42f87b1f0a01'},
+ {n:'Money Man',k:['money','mm','finance'],own:/money/i,id:'31c31f89-9815-4682-abcb-5fe79899dcd4'},
+ {n:'Video',full:'Video Creation Expert',k:['video'],own:/video/i,id:'b255c7ec-d31b-4256-9a17-feb358f3b1a1'},
+ {n:'Music',full:'Music Maker',k:['music'],own:/music/i,id:'7bd8d175-8c10-4064-8b4b-24ca838d3ccd'},
+ {n:'Diy Machine',k:['diy'],own:/diy/i,id:'b2436a77-9581-4fa3-8310-7edaa951ed53'}
+];
 
-  // ---- Approvals (mirror of Approvals tab). First names only. ----
-  var approvals=[
-    {id:'A1', type:'Review request', title:'Google review request text — sent Oct 14 (62)', who:'Marketeer',
-     draft:'Hi {first name}, thanks for choosing Berman Electric! If you have a moment, would you leave us a quick Google review? It really helps: {review link}',
-     note:'A1 Approved and sent via Copilot Text Blast (62 delivered Oct 14). No action needed.'},
-    {id:'A2', type:'Follow-up text', title:'Timothy: estimate check-in text', who:'Head Honcho', boardWait:true,
-     draft:'(Handled by Rob.)',
-     note:'A2 Changes / handled by Rob already. No action needed.'}
-  ];
-  var AK='bermanMC.appr.v1';
-  function getAppr(){try{var o=JSON.parse(localStorage.getItem(AK)); if(o&&typeof o==='object') return o;}catch(e){}
-    // Offline snapshot defaults (Oct 15): A1 Approved/sent, A2 handled by Rob
-    return {A1:'Approved',A2:'Changes'};}
-  function setAppr(o){try{localStorage.setItem(AK,JSON.stringify(o));}catch(e){}}
-  function renderAppr(){
-    var a=getAppr(), open=0, html='';
-    approvals.forEach(function(x){
-      var st=a[x.id]; if(!st) open++;
-      html+='<div class="card appr'+(st?' done-local':'')+'" data-id="'+x.id+'"><div class="row"><h3>'+esc(x.title)+'</h3><span class="chip '+(st==='Approved'?'s-done':st==='Changes'?'s-wait':'s-prog')+'">'+(st||'Pending')+'</span></div>'+
-        '<div class="meta">'+esc(x.type)+' · '+esc(x.who)+'</div><pre>'+esc(x.draft)+'</pre><p>'+esc(x.note)+'</p>'+
-        (st?'<div class="st" id="st'+x.id+'">'+(st==='Approved'?(/text/i.test(x.type+' '+x.title)?'✓ Approved. Head Honcho will get it ready for you to send.':'✓ Approved'):'✎ Changes sent')+' · <button class="mini-undo" data-undo="'+x.id+'" style="background:none;border:none;color:var(--teal);text-decoration:underline;cursor:pointer">undo</button></div>':
-        '<div class="acts"><button class="ok" data-ok="'+x.id+'">✓ Approve</button><button class="ed" data-ed="'+x.id+'">✎ Edit</button></div>'+
-        '<div hidden id="box'+x.id+'"><textarea id="note'+x.id+'" placeholder="What should change?"></textarea><div class="acts" style="margin-top:6px"><button class="ed" data-send="'+x.id+'">Send changes</button></div></div><div class="st" id="st'+x.id+'"></div>')+'</div>';
-    });
-    $('apprGrid').innerHTML=html; $('apprCnt').textContent=open+' pending'; renderScore();
-  }
-  // Try the dedicated 'approve' action; if the deployed script is older, fall back to built-in done/ask actions.
-  function sendAppr(x,status,note){
-    return api({action:'approve',id:x.id,status:status,note:note||''}).catch(function(e){
-      if(!/unknown action/.test(e.message)) throw e;
-      if(status==='Approved') return api({action:'done',item:'APPROVAL '+x.id+': '+x.title});
-      return api({action:'ask',bot:x.who,question:'[Approval '+x.id+' · Changes] '+x.title+' → '+note});
-    });
-  }
-  function act(id,status,note){
-    var x=approvals.filter(function(y){return y.id===id;})[0], a=getAppr(); a[id]=status; setAppr(a); renderAppr();
-    var el=$('st'+id); if(!conn()){ if(el) el.textContent+=' (saved on this phone; tap Connect to sync)'; return; }
-    if(el) el.textContent+=' · saving…';
-    sendAppr(x,status,note).then(function(){refreshSoon();var el=$('st'+id); if(el) el.innerHTML=el.innerHTML.replace(' · saving…',' · on board ✓');})
-      .catch(function(e){var a=getAppr(); delete a[id]; setAppr(a); renderAppr(); var el=$('st'+id); if(el) el.textContent='⚠ Not saved: '+e.message;});
-  }
-  $('apprGrid').addEventListener('click',function(e){var t=e.target, d=t.dataset;
-    if(d.ok) act(d.ok,'Approved');
-    else if(d.ed){ $('box'+d.ed).hidden=false; $('note'+d.ed).focus(); }
-    else if(d.send){ var n=$('note'+d.send).value.trim(); if(!n){ $('note'+d.send).placeholder='Type what to change first'; return;} act(d.send,'Changes',n); }
-    else if(d.undo){ var a=getAppr(); delete a[d.undo]; setAppr(a); renderAppr(); }
-  });
-  showConn();
-  document.getElementById('resetTicks').addEventListener('click',function(){setTicks({});renderWaiting();});
-  window.__mcReady=1; renderWaiting(); renderAppr();
+// ---- Snapshot fallback (first names only, no addresses/phones/money) ----
+var SNAP={board:[
+ {row:29,item:'Phil Fri job, 2 PM (Wading River)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job 2 PM today, Wading River (lighting). Tap Done after the job is finished.',due:'2026-10-16',updated:''},
+ {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Was yesterday. Tap Done if finished.',due:'2026-10-15',updated:''},
+ {row:27,item:'Google reviews: 35 at 5.0 (was 33 before blast)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
+ {row:30,item:'Timothy Wed job, 8 AM (East Islip)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Rewiring job Wed Oct 28, 8 AM to 4 PM',due:'2026-10-28',updated:''}
+],approvals:[]};
+var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
+var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
 
-  // ---- Live mode: read the Ops Board via the 'state' action. Falls back to the baked-in snapshot above. ----
-  var SNAP_TODAY=null, liveOn=false, busy=false;
-  function setTag(t,ok){var e=$('liveTag'); e.textContent=t; e.style.color=ok?'#5ef08f':'';}
-  function stKey(x){x=String(x||'').toLowerCase(); return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
-  function nyYmd(){var p=nyParts(new Date()); return p.year+'-'+p.month+'-'+p.day;}
-  function applyState(j){
-    var rows=(j.board||[]).filter(function(r){return r.item;});
-    var nb={done:0,prog:0,wait:0,block:0,not:0}, today=0, ymd=nyYmd();
-    rows.forEach(function(r){var k=stKey(r.status); nb[k]++; if(k==='done' && String(r.updated).indexOf(ymd)===0) today++;});
-    var w=rows.filter(function(r){return stKey(r.status)==='wait' && !/^APPROVAL /.test(r.item);}).map(function(r){
-      return {id:'r'+r.row, row:r.row, item:r.item, t:r.item, d:r.next||'', who:(r.owner||'')+(r.due?' · due '+r.due:''), s:'wait'};});
-    waiting.length=0; Array.prototype.push.apply(waiting,w);
-    board=nb; SNAP_TODAY=today;
-    approvals.length=0; var a={};
-    (j.approvals||[]).forEach(function(x){approvals.push({id:x.id,type:x.type||'',title:x.title||x.id,who:'Head Honcho',draft:x.draft||'',note:x.note?('Your note: '+x.note):''}); if(x.status==='Changes') a[x.id]='Changes';});
-    setTicks({}); setAppr(a); liveOn=true;
-    if(window.MC) MC.emit(j);
-    $('gBlock').textContent=nb.block;
-    renderWaiting(); renderAppr();
-    var p=nyParts(new Date()), h=+p.hour, ap=h>=12?'PM':'AM'; h=h%12||12;
-    setTag('● Live, updated '+h+':'+p.minute+' '+ap, true);
+function stKey(x){x=String(x||'').toLowerCase();return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
+function rows(){return (S.board||[]).filter(function(r){return r.item;});}
+
+// ---- Needs you: approvals first, then rows waiting on Rob ----
+var KEPT={}, SMSU={};  // KEPT: approved cards kept on screen after refresh; SMSU: id -> sms: url or 'none'
+function isLead(t){return /new lead/i.test(t||'');}
+function isText(t){return /\btext\b|lead reply/i.test(t||'')&&!/review request/i.test(t||'');}
+function nyMs(str){var m=String(str||'').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/);if(!m)return NaN;
+  var now=new Date(),p=nyParts(now),off=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute)-Math.floor(now.getTime()/6e4)*6e4;
+  return Date.UTC(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0))-off;}
+function ago(str){var t=nyMs(str);if(isNaN(t))return '';var mn=Math.max(0,Math.round((Date.now()-t)/6e4));
+  return mn<60?mn+'m ago':mn<2880?Math.round(mn/60)+'h ago':Math.round(mn/1440)+'d ago';}
+function needs(){
+  var a=(S.approvals||[]).map(function(x){return {id:'A:'+x.id,kind:'appr',aid:x.id,t:x.title||x.id,d:x.draft||x.type||'',who:'Head Honcho',lead:isLead(x.type),text:isText(x.type),created:x.created||''};});
+  a=a.filter(function(x){return x.lead;}).sort(function(p,q){return (nyMs(q.created)||0)-(nyMs(p.created)||0);}).concat(a.filter(function(x){return !x.lead;}));
+  Object.keys(KEPT).forEach(function(k){if(!a.some(function(y){return y.id===k;}))a.unshift(KEPT[k]);});
+  var w=rows().filter(function(r){return stKey(r.status)==='wait'&&!/^APPROVAL /.test(r.item);})
+    .map(function(r){return {id:'R:'+r.row,kind:'row',row:r.row,item:r.item,t:r.item,d:r.next||'',who:r.owner||'Head Honcho'};});
+  return a.concat(w);
+}
+function cardHtml(x){
+  var L=local[x.id];
+  var head=(x.lead?'<span class="badge">NEW LEAD</span>':'')+esc(x.t)+(x.lead&&ago(x.created)?'<span class="age">'+esc(ago(x.created))+'</span>':'');
+  if(L){var U=SMSU[x.id];
+    return '<div class="card ok" data-id="'+esc(x.id)+'"><div class="t">'+head+'</div><div class="okm">✓ '+esc(L)+'</div>'+
+     (U&&U!=='none'&&U!=='wait'?'<div class="acts"><button class="pri" data-a="sms">💬 Text from my phone</button></div>':U==='none'?'<div class="okm" style="color:var(--dim)">No number on file</div>':'')+'</div>';}
+  return '<div class="card nc" data-id="'+esc(x.id)+'"><div class="tx"><div class="t">'+head+'</div>'+(x.d?'<div class="d">'+esc(x.d)+'</div>':'')+'</div>'+
+   '<div class="acts"><button data-a="note" aria-label="Note">✎</button><button class="pri" data-a="ok">'+(x.kind==='appr'?'Approve':'Done')+'</button></div></div>';
+}
+function renderNeeds(){
+  var N=needs(), open=N.filter(function(x){return !local[x.id];});
+  var top=N.slice(0,3);
+  $('needs').innerHTML=top.length?top.map(cardHtml).join(''):'<div class="empty">Nothing needs you. The crew is running.</div>';
+  $('needCnt').textContent=open.length?open.length+' open':'';
+  $('overflow').innerHTML=N.length>3?N.slice(3).map(cardHtml).join(''):'<div class="empty">Nothing else waiting.</div>';
+}
+function find(id){return needs().filter(function(x){return x.id===id;})[0];}
+function act(x,note){
+  var p;
+  if(x.kind==='appr'){
+    p=api({action:'approve',id:x.aid,status:note?'Changes':'Approved',note:note||''}).then(function(){
+      if(note)return 'Note sent. Head Honcho will revise.';
+      if(!x.text)return 'Approved. Head Honcho takes the next step; nothing is sent without you.';
+      KEPT[x.id]=x;SMSU[x.id]='wait';
+      api({action:'phone',id:x.aid}).then(function(j){
+        SMSU[x.id]='sms:'+String(j.phone).replace(/[^\d+]/g,'')+'&body='+encodeURIComponent(j.draft||'');local[x.id]='Approved. Messages opens with the text filled in.';render();go(SMSU[x.id]);
+      }).catch(function(err){SMSU[x.id]='none';local[x.id]='Approved.';render();if(/unknown action|approval not found/.test(err.message))toast('Texting needs the script update');});
+      return 'Approved. Getting the number…';});
+  } else if(note){
+    p=api({action:'ask',bot:x.who.split('/')[0].trim()||'Head Honcho',question:'[Re: '+x.item+'] '+note}).then(function(){return 'Note sent to '+(x.who||'Head Honcho')+'.';});
+  } else {
+    p=api({action:'done',item:x.item,row:x.row}).then(function(){return 'Marked done on the board.';});
   }
-  function refresh(){
-    if(!conn()){ setTag('● Offline snapshot'); return Promise.resolve(); }
-    if(busy) return Promise.resolve(); busy=true;
-    return api({action:'state'}).then(applyState).catch(function(){ setTag(liveOn?'● Offline, showing last update':'● Offline snapshot'); })
-      .then(function(){busy=false;});
-  }
-  var rt=null; function refreshSoon(){clearTimeout(rt); rt=setTimeout(refresh,1500);}
-  refresh(); setInterval(function(){ if(!document.hidden) refresh(); },60000);
-  document.addEventListener('visibilitychange',function(){ if(!document.hidden) refresh(); });
-
-  // ---- Crew ----
-  var crew = [
-    {n:'Head Honcho', lane:'Ops · Copilot · briefs', light:'l-blue', s:'prog', d:'Coordinator: board, Rob\'s Copilot, PRs, routines, scheduling, permits, follow-ups.', need:'Coding usage reset / on-demand for blocked PRs (#18 bug fixes, read-only key). Rob picks visit times.'},
-    {n:'Marketeer', lane:'GBP · reviews · Thumbtack', light:'l-amber', s:'wait', d:'Lead replies, review requests, GBP edits, LSA plan (no spend).', need:'GBP remaining (dead website link + hide home address), Thumbtack reconnect.'},
-    {n:'SEO & AEO Desk', lane:'Site content · FAQ', light:'l-amber', s:'wait', d:'Website and AI-search content: FAQ, consistent prices, weekly digest.', need:'Rob decides what the panel price includes.'},
-    {n:'Video Creation Expert', lane:'Job videos', light:'l-amber', s:'wait', d:'Short before/after job videos with captions. No customer faces or addresses.', need:'Rob\'s input on video captions.'},
-    {n:'Money Man', lane:'Finance · no cash alerts', light:'l-amber', s:'wait', d:'Read-only Chase, sorting, invoice drafts. Never moves money.', need:'Personal vs. business tagging; connect or list non-Chase cards.'},
-    {n:'Music Maker', lane:'Personal music', light:'l-green', s:'prog', d:'Rob\'s personal music. Separate from the business.', need:'Nothing. Off the business board.'},
-    {n:'Diy Machine', lane:'Role TBD', light:'l-grey', s:'not', d:'No lane yet. Does nothing until one is defined.', need:'Rob defines a lane or archives it.'}
-  ];
-  document.getElementById('crewGrid').innerHTML = crew.map(function(c){
-    return '<div class="card bot"><div class="row"><div class="name"><span class="light '+c.light+'"></span><h3>'+esc(c.n)+'</h3></div>'+chip(c.s)+'</div>'+
-      '<div class="lane">'+esc(c.lane)+'</div><p>'+esc(c.d)+'</p><div class="need"><span>Needs</span>'+esc(c.need)+'</div></div>';
-  }).join('');
-
-  // ---- Rhythm ----
-  var rhythm = [
-    {id:'am', when:'~6:30 AM', what:'Morning brief', who:'Head Honcho', d:'Today\'s jobs and visits, leads to call, drafts to approve, one question. No cash lines.', s:'prog', dow:null, mins:390},
-    {id:'pm', when:'~6:00 PM', what:'Evening wrap', who:'Head Honcho', d:'What got done, jobs to invoice, tomorrow\'s schedule, drafts.', s:'prog', dow:null, mins:1080},
-    {id:'lead', when:'Mon', what:'Lead report', who:'Head Honcho + Marketeer', d:'Open leads, open estimates and follow-up status. Proposed.', s:'not', dow:1},
-    {id:'money', when:'Mon', what:'Money snapshot', who:'Money Man', d:'Money in and out from real data only. Proposed.', s:'not', dow:1}
-  ];
-
-  // ---- Clock + time-aware bits ----
-  var fmtT=new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true});
-  var fmtD=new Intl.DateTimeFormat('en-US',{timeZone:TZ,weekday:'long',month:'short',day:'numeric',year:'numeric'});
-  var fmtParts=new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short',hourCycle:'h23'});
-  function nyParts(d){var o={};fmtParts.formatToParts(d).forEach(function(p){o[p.type]=p.value;});return o;}
-  var DOW={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
-  var lastNext=null;
-  function tick(){
-    var now=new Date(), p=nyParts(now);
-    document.getElementById('clock').textContent=fmtT.format(now);
-    document.getElementById('date').textContent=fmtD.format(now)+' · ET';
-    var ymd=p.year+'-'+p.month+'-'+p.day;
-    var mins=(+p.hour)*60+(+p.minute), secs=mins*60+(+p.second);
-    document.getElementById('todayLabel').textContent=(ymd==='2026-10-15'?'Today · ':'')+p.weekday+' '+p.month+'/'+p.day;
-
-    // Capitalize / Empower: missed Wed Oct 14 — needs reschedule
-    var cd=document.getElementById('callCountdown'), cc=document.getElementById('callChip');
-    cd.textContent='Missed Oct 14 · reschedule Mon–Fri 9–6 ET or in Robinhood';
-    cc.className='chip s-wait'; cc.textContent='Reschedule';
-
-    // Rhythm: highlight the next routine
-    var dow=DOW[p.weekday], next;
-    if(mins<390) next='am'; else if(mins<1080) next='pm'; else next=(dow===0?'lead':'am');
-    if(dow===1 && mins<390) next='lead';
-    if(next!==lastNext){
-      lastNext=next;
-      document.getElementById('rhythm').innerHTML=rhythm.map(function(r){
-        return '<div class="card'+(r.id===next?' next':'')+'"><div class="when">'+esc(r.when)+'</div><h3 style="margin-top:4px">'+esc(r.what)+'</h3>'+
-          '<p>'+esc(r.d)+'</p><div class="row" style="margin-top:8px"><span class="meta" style="margin:0">'+esc(r.who)+'</span>'+chip(r.s).replace('In progress','Live').replace('Not started','Proposed')+'</div></div>';
-      }).join('');
-    }
-  }
-  tick(); setInterval(tick,1000);
-  window.MC={api:api,conn:conn,esc:esc,nyParts:nyParts,$:$,refreshSoon:function(){refreshSoon();},subs:[],last:null,
-    on:function(fn){this.subs.push(fn); if(this.last) fn(this.last);},emit:function(j){this.last=j; this.subs.forEach(function(fn){try{fn(j);}catch(e){console.error(e);}});}};
+  return p.then(function(m){local[x.id]=m;render();toast('✓ Saved');refreshSoon();})
+   .catch(function(e){toast(/not connected/.test(e.message)?'Connect your Ops Board link in ⚙︎':'Didn\'t save: '+e.message);});
+}
+function onCardClick(e){
+  var b=e.target.closest('button[data-a]');if(!b)return;var c=b.closest('.card'),x=find(c.dataset.id);if(!x)return;
+  if(b.dataset.a==='ok') return act(x);
+  if(b.dataset.a==='sms'&&SMSU[x.id]&&/^sms:/.test(SMSU[x.id])) return go(SMSU[x.id]);
+  if(b.dataset.a==='note'){var t=c.querySelector('textarea');
+    if(!t){c.classList.remove('nc');t=document.createElement('textarea');t.className='note';t.placeholder='Your note…';c.insertBefore(t,c.querySelector('.acts'));b.textContent='Send note';b.className='pri';b.style.flex='1';t.focus();return;}
+    if(t.value.trim()) act(x,t.value.trim());}
+}
+$('needs').addEventListener('click',onCardClick);$('overflow').addEventListener('click',onCardClick);
+// Swipe right on a card = Approve / Done
+(function(){var sx=0,el=null;
+ $('needs').addEventListener('touchstart',function(e){el=e.target.closest('.card');sx=e.touches[0].clientX;},{passive:true});
+ $('needs').addEventListener('touchmove',function(e){if(!el)return;var dx=e.touches[0].clientX-sx;if(dx>0)el.style.transform='translateX('+Math.min(dx,120)+'px)';},{passive:true});
+ $('needs').addEventListener('touchend',function(e){if(!el)return;var dx=e.changedTouches[0].clientX-sx;el.style.transform='';var x=find(el.dataset.id);if(dx>100&&x&&!local[x.id])act(x);el=null;});
 })();
-</script>
-<script id="mcx">
-(function(){
-  var MC=window.MC; if(!MC) return; var esc=MC.esc, $=MC.$;
-  // Offline snapshot of Board rows (first names only, no addresses/phones/money), same shape as the live 'state' action.
-  var SNAP={board:[
-    {row:2,item:'Timothy estimate follow-up',area:'Estimating',owner:'Head Honcho',status:'Done',next:'Rob handled check-in',due:'',updated:'2026-10-14'},
-    {row:3,item:'Randall Thu job, 2 PM (Setauket)',area:'Scheduling',owner:'Rob',status:'Done',next:'Confirmed 2 PM; Copilot may still show 2 AM',due:'2026-10-15',updated:'2026-10-14'},
-    {row:4,item:'Schedule estimate visit: Mike (kitchen switch, Centereach)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:'2026-10-14'},
-    {row:5,item:'Schedule estimate visit: Luann (Ring doorbell + camera, Syosset)',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
-    {row:6,item:'Schedule estimate visit: Matt',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
-    {row:7,item:'Schedule estimate visit: Adnan',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
-    {row:8,item:'Schedule estimate visit: Susan',area:'Scheduling',owner:'Head Honcho',status:'Not started',next:'Suggest visit times for Rob',due:'',updated:''},
-    {row:9,item:'Phil (Wading River) won: convert to job',area:'Jobs',owner:'Head Honcho',status:'Not started',next:'Set up job in app (lighting)',due:'',updated:''},
-    {row:10,item:'Loriana solar estimate visit, Thu Oct 15 10 AM, Islandia',area:'Estimating',owner:'Rob',status:'Not started',next:'Visit today; confirm text sent; notes after for draft estimate',due:'2026-10-15',updated:'2026-10-15'}
-  ]};
-  MC.snap=SNAP;
-  function data(){return MC.last||SNAP;}
-  MC.data=data;
-  // ---- Lead classification from Board rows ----
-  function leadOf(r){
-    var it=String(r.item||''), low=it.toLowerCase(), st=String(r.status||'').toLowerCase(), done=/done/.test(st);
-    var stage=null;
-    if(/\blost\b/.test(low)) stage='lost';
-    else if(/\bwon\b/.test(low)) stage='won';
-    else if(/estimate (follow|sent|out)|follow-up on estimate|estimate.*(check-in|followup)/.test(low)) stage='est';
-    else if(/schedule (an )?(estimate )?visit|new lead|lead:/.test(low)) stage='new';
-    else if(/(estimate|site) visit|walkthrough|walk-through/.test(low)) stage='visit';
-    if(!stage) return null;
-    if(done && stage!=='won' && stage!=='lost') return null;
-    var nm=it.replace(/^(schedule (an )?(estimate )?visit|new lead|lead)\s*:\s*/i,'').split(/[\s(,:]/)[0];
-    var sub=(it.match(/\(([^)]*)\)/)||[])[1]||it.replace(/^.*?:\s*/,'').replace(nm,'').trim();
-    return {stage:stage,name:nm,sub:sub,next:r.next||'(no next action on the board yet)',owner:r.owner||'',due:r.due||'',row:r.row,raw:r};
+
+// ---- Score + single next action ----
+function score(){
+  var b={done:0,prog:0,wait:0,block:0,not:0},today=0,d=ymd(new Date());
+  rows().forEach(function(r){var k=stKey(r.status);b[k]++;if(k==='done'&&String(r.updated).indexOf(d)===0)today++;});
+  var tot=b.done+b.prog+b.wait+b.block+b.not||1;
+  today+=Object.keys(local).length;
+  return Math.max(0,Math.min(100,Math.round((b.done+.5*b.prog+.25*b.not)/tot*100+5*today)));
+}
+function nextLine(st){
+  var N=needs().filter(function(x){return !local[x.id];});
+  if(N.length) return N[0].lead?'Reply to new lead: '+N[0].t:N[0].kind==='appr'?'Approve: '+N[0].t:N[0].t;
+  if(st[0]) return st[0].name+' at '+st[0].time+(st[0].town?', '+st[0].town:'');
+  return 'You\'re clear. Tell a bot what\'s next.';
+}
+
+// ---- Today: next 2 appointments ----
+var TOWNS=['East Northport','Lake Ronkonkoma','Ronkonkoma','Islandia','East Setauket','Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset'];
+var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;});return best;}
+function stopOf(r){
+  var t=String(r.item||'')+' '+String(r.next||''),low=t.toLowerCase();
+  if(!/visit|job|appointment|install|service call|walkthrough/.test(low)||/^schedule /i.test(r.item)||stKey(r.status)==='done'&&!/job/.test(low))return null;
+  var tbd=/\btbd\b/i.test(r.item);
+  var tm=String(r.item).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i)||(!tbd&&t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i));if(!tm&&!tbd)return null;
+  var due=String(r.due||''),date=/^\d{4}-\d{2}-\d{2}/.test(due)?due.slice(0,10):'';
+  // A date-only cell read in UTC comes back as 7/8 PM ET the day before; shift it back.
+  if(date&&/ (19|20):00$/.test(due)){var dd=new Date(date+'T12:00:00Z');dd.setUTCDate(dd.getUTCDate()+1);date=dd.toISOString().slice(0,10);}
+  var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
+  if(!date&&dm)date=nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');
+  if(!date)return null;
+  var h=tm?+tm[1]%12+(/pm/i.test(tm[3])?12:0):0,m=tm?+(tm[2]||0):0;
+  var kind=/estimate/.test(low)?'Estimate':/job|install/.test(low)?'Job':'Visit';
+  var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|fan|outlet)/i)||[])[1]||'';
+  return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:tbd&&!tm?-1:h*60+m,tbd:tbd&&!tm,
+    time:tbd&&!tm?'Time TBD':(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():''),st:stKey(r.status)};
+}
+function stops(){
+  var now=new Date(),td=ymd(now),tm=ymd(new Date(now.getTime()+864e5)),p=nyParts(now),nowM=+p.hour*60+ +p.minute;
+  return rows().map(stopOf).filter(function(x){return x&&x.st!=='done'&&(x.date===tm||x.date===td&&(x.tbd||x.mins+90>=nowM));})
+   .sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;}).slice(0,2)
+   .map(function(x){x.day=x.date===td?'':'Tmrw ';return x;});
+}
+var STOPS=[],FIN={};  // FIN: row -> green finish message
+function renderToday(){
+  STOPS=stops();
+  $('dayLbl').textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}).format(new Date());
+  $('today').innerHTML=STOPS.length?STOPS.map(function(x,i){
+    return '<div class="card stop'+(FIN[x.row]?' fin':'')+'" data-i="'+i+'"><div class="who"><b><em>'+esc(x.day+x.time)+'</em>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
+     (FIN[x.row]||x.st==='done'?'':'<button class="ib dn" data-a="done" aria-label="Job done">Done</button>')+'<button class="ib" data-a="call" aria-label="Call">📞</button><button class="ib" data-a="sms" aria-label="Text">💬</button><button class="ib" data-a="cal" aria-label="Add to Calendar">📅</button><button class="ib go" data-a="go">Go</button>'+(FIN[x.row]?'<div class="okm2" style="flex-basis:100%">✓ '+esc(FIN[x.row])+'</div>':'')+'</div>';
+  }).join(''):'<div class="empty">Open road. Nothing booked next.</div>';
+}
+function go(url){window.location.href=url;}
+$('today').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-a]');if(!b)return;var x=STOPS[+b.closest('.stop').dataset.i];if(!x)return;var a=b.dataset.a;
+  if(a==='done'){
+    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
+    b.disabled=true;b.textContent='…';
+    return api({action:'done',item:x.item,row:x.row,finish:true}).then(function(j){
+      FIN[x.row]=j.finished?(j.queued===false?'Marked done. Review text was already waiting.':'Marked done. Review text is waiting for your approval.'):'Marked done. Review text needs the script update.';
+      render();toast('✓ Saved');refreshSoon();
+    }).catch(function(err){b.disabled=false;b.textContent='Done';toast('Didn\'t save: '+err.message);});
   }
-  MC.leadOf=leadOf;
-  var COLS=[['new','New','c-new'],['visit','Visit','c-visit'],['est','Estimate','c-est'],['won','Won / Lost','c-won']];
-  var openRow=null;
-  function renderPipe(){
-    var L=(data().board||[]).map(leadOf).filter(Boolean), n=0;
-    $('kan').innerHTML=COLS.map(function(c){
-      var xs=L.filter(function(l){return l.stage===c[0]||(c[0]==='won'&&l.stage==='lost');}); n+=xs.length;
-      return '<div class="kcol '+c[2]+'"><h4>'+c[1]+' <b>'+xs.length+'</b></h4>'+(xs.length?xs.map(function(l){
-        return '<button class="lead'+(l.stage==='lost'?' lost':'')+(openRow===l.row?' open':'')+'" data-row="'+l.row+'"><div class="nm">'+esc(l.name)+(l.stage==='lost'?' · lost':l.stage==='won'?' 🏆':'')+'</div>'+
-          '<div class="sb">'+esc(l.sub)+'</div><div class="nx">▶ Next: '+esc(l.next)+(l.owner?' <span class="sb">· '+esc(l.owner)+'</span>':'')+(l.due?' <span class="sb">· due '+esc(l.due)+'</span>':'')+'</div></button>';
-      }).join(''):'<div class="kempty">Nothing here yet</div>')+'</div>';
-    }).join('');
-    $('pipeCnt').textContent=n+' lead'+(n===1?'':'s')+(MC.last?' · live':' · snapshot');
+  if(a==='go'){
+    var fb=function(why){toast(why);go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY'));};
+    if(!conn())return fb('Town only. Connect ⚙︎ for exact address.');
+    api({action:'address',row:x.row,item:x.item}).then(function(j){go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address));}).catch(function(err){fb('Town only ('+err.message+')');});
+  } else if(a==='call'||a==='sms'){
+    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
+    api({action:'phone',row:x.row,item:x.item}).then(function(j){go((a==='call'?'tel:':'sms:')+String(j.phone).replace(/[^\d+]/g,''));})
+     .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':/no (number|phone)/.test(err.message)?'No number on file':'No number: '+err.message);});
+  } else if(a==='cal'){
+    if(x.tbd)return toast('Set the time first');
+    var p=function(n){return String(n).padStart(2,'0');},d=x.date.replace(/-/g,''),st=d+'T'+p(x.h)+p(x.m)+'00',eh=x.h+1;
+    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berman//MC//EN','BEGIN:VEVENT','UID:mc-'+x.row+'-'+d+'@berman','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
+      'DTSTART;TZID=America/New_York:'+st,'DTEND;TZID=America/New_York:'+d+'T'+p(Math.min(eh,23))+p(eh>23?59:x.m)+'00','SUMMARY:'+x.name+' · '+x.kind,'LOCATION:'+(x.town?x.town+', NY':''),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    var u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})),l=document.createElement('a');l.href=u;l.download=x.name+'.ics';document.body.appendChild(l);l.click();l.remove();
   }
-  $('kan').addEventListener('click',function(e){var b=e.target.closest('.lead'); if(!b) return; var r=+b.dataset.row; openRow=(openRow===r?null:r); renderPipe();});
-  MC.on(renderPipe); renderPipe();
-  // ---- Today's route: today's + tomorrow's visits/jobs in time order. Town only; address fetched on tap. ----
-  var TOWNS=['Ronkonkoma','Islandia','Setauket','East Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset','Lake Ronkonkoma'];
-  var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-  function ymdNY(d){var p=MC.nyParts(d); return p.year+'-'+p.month+'-'+p.day;}
-  function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;}); return best;}
-  function stopOf(r){
-    var t=String(r.item||'')+' '+String(r.next||''), low=t.toLowerCase();
-    if(!/visit|job|appointment|install|service call|walkthrough/.test(low)) return null;
-    if(/^schedule /i.test(r.item)) return null;
-    var tm=t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i); if(!tm) return null;
-    var date=/^\d{4}-\d{2}-\d{2}/.test(r.due)?r.due.slice(0,10):'';
-    var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
-    if(!date&&dm){date=MC.nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');}
-    if(!date) return null;
-    var h=+tm[1]%12+(/pm/i.test(tm[3])?12:0), m=+(tm[2]||0);
-    var nm=String(r.item).split(/[\s(,:]/)[0], kind=/estimate/.test(low)?'Estimate visit':/job|install/.test(low)?'Job':'Visit';
-    var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|switch|outlet)/i)||[])[1]||'';
-    return {row:r.row,item:r.item,name:nm,date:date,mins:h*60+m,time:(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():'')};
-  }
-  MC.stopOf=stopOf;
-  function renderRoute(){
-    var now=new Date(), td=ymdNY(now), tm=ymdNY(new Date(now.getTime()+864e5));
-    var S=(data().board||[]).map(stopOf).filter(function(x){return x&&(x.date===td||x.date===tm);}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;});
-    MC.stops=S; var html='';
-    [[td,'Today'],[tm,'Tomorrow']].forEach(function(d){
-      var xs=S.filter(function(x){return x.date===d[0];});
-      html+='<div class="dayh">'+d[1]+' · '+xs.length+' stop'+(xs.length===1?'':'s')+'</div>';
-      html+=xs.length?xs.map(function(x,i){return '<div class="stop"><div class="tm">'+esc(x.time)+'<small>#'+(i+1)+'</small></div><div class="who"><b>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
-        '<button class="nav" data-row="'+x.row+'">🧭 Go</button></div>';}).join(''):'<div class="kempty">Open road. Nothing booked'+(d[1]==='Today'?' today.':' tomorrow.')+'</div>';
-    });
-    $('route').innerHTML=html; $('routeCnt').textContent=S.length+' stop'+(S.length===1?'':'s');
-  }
-  function go(url){ MC.lastNav=url; try{ window.location.href=url; }catch(e){} }
-  $('route').addEventListener('click',function(e){
-    var b=e.target.closest('.nav'); if(!b) return; var x=(MC.stops||[]).filter(function(s){return s.row===+b.dataset.row;})[0]; if(!x) return;
-    var fallback=function(why){ $('routeMsg').textContent=(x.town?'Opening Maps to '+x.town+' (town only). ':'No town on the board for this stop. ')+why;
-      go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY')); };
-    if(!MC.conn()) return fallback('Connect your Ops Board link to get the exact address.');
-    b.textContent='… locating';
-    MC.api({action:'address',row:x.row,item:x.item}).then(function(j){ b.textContent='🧭 Go'; $('routeMsg').textContent='Opening Maps…'; go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address)); })
-      .catch(function(err){ b.textContent='🧭 Go'; fallback(/unknown action/.test(err.message)?'Exact address needs the script update.':'('+err.message+')'); });
-  });
-  MC.on(renderRoute); renderRoute(); setInterval(renderRoute,5*60000);
-  // ---- Weekly reset (Monday checklist + top 3, saved via the existing 'ask' action) ----
-  var WK='bermanMC.week.v1', STEPS=[['review','Review last week (wins + misses)'],['wait','Clear Waiting on Rob'],['top3','Pick the top 3 for the week'],['bots','Check bot reports']];
-  function weekKey(){var p=MC.nyParts(new Date()), d=new Date(Date.UTC(+p.year,+p.month-1,+p.day)), dow=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-dow); return d.toISOString().slice(0,10);}
-  MC.weekKey=weekKey;
-  function getWk(){try{var o=JSON.parse(localStorage.getItem(WK))||{}; return o.week===weekKey()?o:{week:weekKey(),c:{},p:['','','']};}catch(e){return {week:weekKey(),c:{},p:['','','']};}}
-  function setWk(o){try{localStorage.setItem(WK,JSON.stringify(o));}catch(e){}}
-  function renderWk(){
-    var o=getWk(), n=0;
-    $('wkList').innerHTML=STEPS.map(function(x){var on=!!o.c[x[0]]; if(on)n++; return '<label class="'+(on?'on':'')+'"><input type="checkbox" data-k="'+x[0]+'"'+(on?' checked':'')+'> '+esc(x[1])+(on?' ✓':'')+'</label>';}).join('');
-    [0,1,2].forEach(function(i){var el=$('wkP'+(i+1)); if(document.activeElement!==el) el.value=o.p[i]||'';});
-    $('wkBar').style.width=(n/STEPS.length*100)+'%';
-    var mon=MC.nyParts(new Date()).weekday==='Mon';
-    $('wkCnt').textContent=(n===STEPS.length?'Week locked 🔒':n+'/'+STEPS.length)+(mon?' · it\'s Monday':' · Mondays');
-    if(o.saved) $('wkMsg').textContent='Saved ✓ '+o.saved;
-  }
-  $('wkList').addEventListener('change',function(e){var k=e.target.dataset.k; if(!k) return; var o=getWk(); o.c[k]=e.target.checked; setWk(o); renderWk();});
-  [1,2,3].forEach(function(i){$('wkP'+i).addEventListener('input',function(){var o=getWk(); o.p[i-1]=this.value; if(o.p.filter(function(v){return v.trim();}).length===3) o.c.top3=true; setWk(o); renderWk();});});
-  $('wkSave').onclick=function(){
-    var o=getWk(), picks=o.p.map(function(v){return v.trim();}).filter(Boolean);
-    if(!picks.length){ $('wkMsg').textContent='Add at least one pick first.'; return; }
-    if(!MC.conn()){ $('wkMsg').textContent='Saved on this phone. Tap Connect to send to the board.'; return; }
-    $('wkMsg').textContent='Saving…';
-    var done=STEPS.filter(function(x){return o.c[x[0]];}).map(function(x){return x[1];});
-    MC.api({action:'ask',bot:'Head Honcho',question:'[Weekly reset · week of '+o.week+'] Top 3: '+picks.map(function(v,i){return (i+1)+') '+v;}).join(' ')+' · Checklist done: '+(done.join(', ')||'none')})
-      .then(function(){var o2=getWk(); var p=MC.nyParts(new Date()); o2.saved=p.weekday+' '+(+p.hour%12||12)+':'+p.minute; setWk(o2); renderWk(); MC.refreshSoon();})
-      .catch(function(e){ $('wkMsg').textContent='Not saved: '+e.message; });
-  };
-  if(MC.nyParts(new Date()).weekday==='Mon') $('wkSec').open=true;
-  renderWk();
-  // ---- Business numbers: counts only (never dollars), computed from Board rows ----
-  function renderNums(){
-    var rows=data().board||[], wk=weekKey(), d=new Date(wk+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()+6); var wkEnd=d.toISOString().slice(0,10);
-    var inWk=function(v){v=String(v||'').slice(0,10); return v>=wk&&v<=wkEnd;};
-    var L=rows.map(function(r){var l=MC.leadOf(r); return l;}).filter(Boolean);
-    var est=L.filter(function(l){return l.stage==='est';}).length;
-    var won=L.filter(function(l){return l.stage==='won'&&(inWk(l.raw.updated)||(!l.raw.updated&&!/done/i.test(l.raw.status)));}).length;
-    var vis=rows.map(MC.stopOf).filter(function(x){return x&&inWk(x.date);}).length;
-    var nw=L.filter(function(l){return l.stage==='new';}).length;
-    var T=[[est,'Estimates out','var(--teal)','📝'],[won,'Jobs won this week','var(--green)','🏆'],[vis,'Visits this week','var(--amber)','🚐'],[nw,'New leads to book','var(--blue)','✨']];
-    $('nums').innerHTML=T.map(function(t){return '<div class="stat"><div class="n" style="color:'+t[2]+'">'+t[0]+'</div><div class="l">'+t[3]+' '+t[1]+'</div></div>';}).join('');
-    MC.nums={est:est,won:won,vis:vis,nw:nw};
-    $('numCnt').textContent='counts only · '+(MC.last?'live':'snapshot');
-  }
-  MC.on(renderNums); renderNums();
-  // ---- Voice ask (Web Speech API, with keyboard-dictation fallback) ----
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null, recOn=false;
-  var FALLBACK='Voice isn\'t available in this browser. On iPhone, tap the 🎤 mic on your keyboard to dictate instead.';
-  function micMsg(t){ $('askMsg').textContent=t; }
-  $('askMic').onclick=function(){
-    var q=$('askQ');
-    if(!SR){ micMsg(FALLBACK); q.focus(); return; }
-    if(recOn){ try{rec.stop();}catch(e){} return; }
-    var base=q.value.trim(); rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
-    rec.onstart=function(){recOn=true; $('askMic').classList.add('rec'); $('askMic').textContent='■ Stop'; micMsg('Listening… talk now.');};
-    rec.onresult=function(e){var t=''; for(var i=0;i<e.results.length;i++) t+=e.results[i][0].transcript; q.value=(base?base+' ':'')+t;};
-    rec.onerror=function(e){ micMsg(/not-allowed|service-not-allowed/.test(e.error)?'Mic blocked. Allow it in settings, or use the 🎤 on your keyboard.':e.error==='no-speech'?'Didn\'t catch that. Tap 🎤 and try again.':FALLBACK); };
-    rec.onend=function(){recOn=false; $('askMic').classList.remove('rec'); $('askMic').textContent='🎤 Talk'; if(/Listening/.test($('askMsg').textContent)) micMsg(q.value.trim()?'Got it. Check it, then tap Send.':'');};
-    try{ rec.start(); }catch(e){ micMsg(FALLBACK); }
-  };
+});
+
+// ---- Weekly plan (Mondays on top; always in More) ----
+function weekPlan(){
+  var now=new Date(),p=nyParts(now),dow=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay(),mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day-((dow+6)%7)));
+  var from=mon.toISOString().slice(0,10),to=new Date(mon.getTime()+6*864e5).toISOString().slice(0,10);
+  var R=rows(),jobs=R.map(stopOf).filter(function(x){return x&&x.date>=from&&x.date<=to;}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;});
+  var leads=(S.approvals||[]).filter(function(x){return isLead(x.type);}).length+R.filter(function(r){return /new lead|schedule (an )?(estimate )?visit/i.test(r.item)&&stKey(r.status)!=='done';}).length;
+  var g=R.filter(function(r){return /marketeer|seo|aeo|video/i.test(r.owner||'')&&stKey(r.status)!=='done'&&stKey(r.status)!=='block';})[0];
+  var wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var jl=jobs.length?jobs.slice(0,6).map(function(x){var d=new Date(x.date+'T12:00:00Z');return '<div class="row">'+esc(wd[d.getUTCDay()]+' '+x.time+' · '+x.name)+'<span>'+esc(x.town||x.kind)+'</span></div>';}).join(''):'<div class="row">No jobs or visits on the board yet<span></span></div>';
+  var mv=g?'<div class="row">Growth move: '+esc(g.item)+'<span>'+esc(g.owner)+'</span></div>':'<a class="lnk" style="margin-top:8px" href="'+CHAT+BOTS[1].id+'">Ask Marketeer for this week\'s move<span>↗</span></a>';
+  return '<div class="card wk">'+jl+'<div class="row">Open leads<span>'+leads+'</span></div>'+mv+'</div>';
+}
+function renderWeek(){var h=weekPlan(),p=nyParts(new Date());$('wkSheet').innerHTML=h;
+  var mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay()===1;$('wkTop').hidden=!mon;if(mon)$('wkCard').innerHTML=h;}
+
+// ---- Bot tiles ----
+function renderBots(){
+  var R=rows();
+  $('bots').innerHTML=BOTS.map(function(b){
+    var mine=R.filter(function(r){return b.own.test(r.owner||'')&&stKey(r.status)!=='done';});
+    var w=mine.filter(function(r){return stKey(r.status)==='wait';}).length,bl=mine.filter(function(r){return stKey(r.status)==='block';}).length,pr=mine.filter(function(r){return stKey(r.status)==='prog';}).length;
+    var dot=bl?'r':w?'a':mine.length?'g':'n',line=bl?'Blocked':w?'Needs you':pr?'Working':mine.length?mine.length+' queued':'Idle';
+    return '<a class="bot" href="'+(b.link||CHAT+b.id)+'"><b>'+esc(b.n)+'</b><span><i class="dot '+dot+'"></i>'+esc(line)+'</span></a>';
+  }).join('')+'<a class="bot" href="https://admin.rbermanelectric.com"><b>Copilot</b><span>Open app ↗</span></a>';
+}
+
+// ---- More sheet ----
+function renderMore(){
+  var R=rows(),wk=Date.now()-7*864e5,c={new:0,visit:0,est:0,won:0};
+  R.forEach(function(r){var l=String(r.item).toLowerCase();
+    if(/\bwon\b/.test(l))c.won++;else if(/estimate (follow|sent|out)/.test(l))c.est++;else if(/schedule (an )?(estimate )?visit|new lead/.test(l))c.new++;else if(/visit|walkthrough/.test(l))c.visit++;});
+  $('nums').innerHTML=[['New',c.new],['Visits',c.visit],['Estimates',c.est],['Won',c.won]].map(function(k){return '<div><b>'+k[1]+'</b><span>'+k[0]+'</span></div>';}).join('');
+  var L=R.filter(function(r){return /lead|visit|estimate|won|lost/i.test(r.item)&&stKey(r.status)!=='done';}).slice(0,8);
+  $('pipe').innerHTML=L.length?L.map(function(r){var k=stKey(r.status),nm=String(r.item).replace(/^Schedule (an )?(estimate )?visit:\s*/i,'').split(/[(:,]/)[0].trim()||r.item;
+    var why=(k==='block'||k==='wait'||/honcho/i.test(r.owner||''))&&r.next?'<div class="d" style="-webkit-line-clamp:2">'+(k==='block'?'Blocked: ':k==='wait'?'Waiting: ':'Next: ')+esc(String(r.next).replace(/^(blocked|waiting)( on)?:?\s*/i,function(m){return /on/i.test(m)?'on ':'';}))+'</div>':'';
+    return '<div class="card pl" data-row="'+esc(r.row)+'" data-item="'+esc(r.item)+'" data-who="'+esc(r.owner||'Head Honcho')+'"><div class="row" style="border:0;padding:0">'+esc(nm)+'<span>'+esc(r.status||'Not started')+'</span></div>'+why+
+      '<div class="acts"><button class="pri" data-pa="done">Done</button><button data-pa="ask">Tell Head Honcho</button></div></div>';}).join(''):'<div class="empty">No open leads on the board.</div>';
+  var c0=conn();$('connState').textContent=c0?'connected':'not connected';
+}
+function openSheet(){renderMore();$('sheet').classList.add('on');document.body.classList.add('lock');$('sheetBox').scrollTop=0;try{if(!history.state||!history.state.mcSheet)history.pushState({mcSheet:1},'');}catch(e){}}
+function closeSheet(fromPop){var sh=$('sheet');if(!sh.classList.contains('on'))return;sh.classList.remove('on');document.body.classList.remove('lock');$('sheetBox').style.transform='';if(!fromPop){try{if(history.state&&history.state.mcSheet)history.back();}catch(e){}}}
+window.addEventListener('popstate',function(){closeSheet(true);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
+(function(){var b=null,y0=0,dy=0;document.addEventListener('DOMContentLoaded',function(){});var box=document.getElementById('sheetBox');
+box.addEventListener('touchstart',function(e){y0=e.touches[0].clientY;dy=0;b=box.scrollTop<=0;},{passive:true});
+box.addEventListener('touchmove',function(e){if(!b)return;dy=e.touches[0].clientY-y0;if(dy>0)box.style.transform='translateY('+dy+'px)';},{passive:true});
+box.addEventListener('touchend',function(){if(b&&dy>90)closeSheet();else box.style.transform='';b=null;});})();
+$('moreBtn').onclick=openSheet;$('xSheet').onclick=function(){closeSheet();};
+$('gear').onclick=function(){$('moreBtn').onclick();setTimeout(function(){$('suUrl').scrollIntoView({block:'center'});},50);};
+$('closeSheet').onclick=function(){closeSheet();};
+$('pipe').addEventListener('click',function(e){var b=e.target.closest('button[data-pa]');if(!b)return;var c=b.closest('.pl'),item=c.dataset.item,row=c.dataset.row,p;
+  if(b.dataset.pa==='done'){if(!confirm('Mark "'+item+'" done?'))return;p=api({action:'done',item:item,row:row}).then(function(){return '✓ Marked done';});}
+  else{var n=prompt('Message to Head Honcho about: '+item);if(!n||!n.trim())return;p=api({action:'ask',bot:'Head Honcho',question:'[Re: '+item+'] '+n.trim()}).then(function(){return '✓ Sent to Head Honcho';});}
+  b.disabled=true;var t=b.textContent;b.textContent='…';p.then(function(m){toast(m);refreshSoon();}).catch(function(err){toast('✗ '+err.message);}).then(function(){b.disabled=false;b.textContent=t;});});
+$('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))closeSheet();});
+$('sendTop').onclick=function(){var t=['t1','t2','t3'].map(function(i){return $(i).value.trim();}).filter(Boolean);if(!t.length)return toast('Add at least one');var b=$('sendTop');b.disabled=true;b.textContent='Sending…';
+  api({action:'ask',bot:'Head Honcho',question:'[Weekly reset] Top 3: '+t.map(function(v,i){return (i+1)+') '+v;}).join(' ')}).then(function(){['t1','t2','t3'].forEach(function(i){$(i).value='';});toast('✓ Top 3 sent to Head Honcho');}).catch(function(e){toast('✗ Not sent: '+e.message);}).then(function(){b.disabled=false;b.textContent='Send top 3';});};
+$('suSave').onclick=function(){var u=$('suUrl').value.trim(),p=$('suPin').value.trim();
+  if(!u)u=DEFURL;if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u))return toast('URL must end with /exec');if(p.length<4)return toast('Enter your PIN');
+  saveConn({url:u||DEFURL,pin:p});api({action:'ping'}).then(function(){toast('✓ Connected');renderMore();refresh();}).catch(function(e){toast(e.message);});};
+$('suClear').onclick=function(){toast('Connection stays saved. Use the main page to change it.');};
+
+// ---- Command bar: sends to Inbox via 'ask', optional @bot routing ----
+function route(q){var m=q.match(/^@(\w+)\s*/);if(!m)return {bot:'Head Honcho',q:q};var k=m[1].toLowerCase();
+  var b=BOTS.filter(function(b){return b.k.indexOf(k)>=0||b.n.toLowerCase().indexOf(k)===0;})[0];return {bot:b?(b.full||b.n):'Head Honcho',q:q.slice(m[0].length)};}
+$('bar').onsubmit=function(e){e.preventDefault();var v=$('cmd').value.trim();if(!v)return;var r=route(v);
+  api({action:'ask',bot:r.bot,question:r.q}).then(function(){$('cmd').value='';$('cmd').blur();toast('✓ Sent to '+r.bot);refreshSoon();})
+   .catch(function(err){toast(/not connected/.test(err.message)?'Connect your Ops Board link in ⚙︎':'Not sent: '+err.message);});};
+$('mic').onclick=function(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){$('cmd').focus();return toast('Tap 🎤 on your keyboard to dictate');}
+  var r=new SR();r.lang='en-US';r.interimResults=false;r.onresult=function(e){$('cmd').value=e.results[0][0].transcript;};r.onerror=function(){toast('Mic unavailable, use keyboard 🎤');};r.start();toast('Listening…');};
+
+// ---- Render + live refresh ----
+function render(){
+  var sc=score(),col=sc>=80?'#7fe3c4':sc>=50?'#9fd3ff':'#f2c46d';
+  $('score').textContent=sc;$('arc').style.strokeDashoffset=(169.6*(1-sc/100)).toFixed(1);$('arc').style.stroke=col;
+  renderNeeds();renderToday();renderBots();renderWeek();$('nextLine').textContent=nextLine(STOPS);
+}
+var busy=false;
+function refresh(){
+  if(!conn()){render();return Promise.resolve();}
+  if(busy)return Promise.resolve();busy=true;
+  var st=function(){return api({action:'state'});};
+  return st().catch(function(e){if(/not connected|PIN|pin/.test(e.message))throw e;return new Promise(function(r){setTimeout(r,2500);}).then(st);}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;live=true;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
+    var p=nyParts(new Date()),h=+p.hour;$('live').textContent='● Live · '+(h%12||12)+':'+p.minute+' '+(h>=12?'PM':'AM');$('live').className='live on';
+  }).catch(function(e){try{$('live').title=e&&e.message||'';}catch(_){}$('live').textContent=live?'● Offline, last update shown':S.at?'● Offline · last live '+S.at.slice(5):'● Offline snapshot';$('live').className='live';})
+   .then(function(){busy=false;render();});
+}
+var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
+function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('../version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
+  if(v&&v.build&&v.build!==BUILD){var k='bermanMC.reload';if(sessionStorage.getItem(k)===v.build)return;sessionStorage.setItem(k,v.build);location.reload();}}).catch(function(){});}
+try{if(/[?&]v=/.test(location.search))history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
+render();refresh();verCheck();
+setInterval(function(){if(!document.hidden)refresh();},60000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden){refresh();verCheck();}});
+window.addEventListener('pageshow',function(e){if(e.persisted){busy=false;refresh();verCheck();}});
+window.addEventListener('online',function(){busy=false;refresh();});
 })();
-</script>
-</body>
-</html>
+</script></body></html>

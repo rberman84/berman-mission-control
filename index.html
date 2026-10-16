@@ -1,120 +1,58 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Mission">
-<meta name="theme-color" content="#0b0d10"><meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Mission">
+<meta name="theme-color" content="#f6f3ee"><meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache">
 <title>Mission Control</title>
 <style>
-:root{--bg:#0b0d10;--card:#14181d;--line:#222830;--tx:#e9eef2;--dim:#8a949e;--ac:#7fe3c4;--amb:#f2c46d;--red:#ef7d7d}
+:root{--bg:#f6f3ee;--ink:#2b2a28;--dim:#8a857c;--faint:#b9b3a8;--card:#fff;--sage:#6f9a86;--sageL:#e6efe9;--sageD:#3f6b57}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif}
-body{padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 74px);max-width:520px;margin:0 auto}
-button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-.top{display:flex;align-items:center;gap:14px}
-.ring{position:relative;width:64px;height:64px;flex:none}.ring svg{transform:rotate(-90deg)}
-.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;font-weight:600}
-.next{flex:1;min-width:0}.next small{color:var(--dim);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
-.next div{font-size:17px;font-weight:600;margin-top:2px}
-.gear{width:44px;height:44px;border-radius:12px;color:var(--dim);font-size:20px}
-.live{font-size:12px;color:var(--dim);margin:2px 0 0 78px}.live.on{color:var(--ac)}
-h2{font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin:12px 2px 7px;display:flex;justify-content:space-between}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;transition:transform .2s,opacity .3s;touch-action:pan-y}
-.card .t{font-weight:600}.card .d{color:var(--dim);font-size:13px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.acts{display:flex;gap:8px;margin-top:10px}
-.nc{display:flex;align-items:center;gap:8px}.nc .tx{flex:1;min-width:0}.nc .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nc .acts{margin:0;flex:none}.nc .acts button{flex:none;width:44px;padding:0}.nc .acts .pri{width:auto;padding:0 14px}
-.acts button{flex:1;min-height:44px;border-radius:12px;background:#1d232a;font-weight:600;font-size:15px}
-.acts .pri{background:var(--ac);color:#06231b}
-.card.ok{border-color:rgba(127,227,196,.5)}.card.ok .okm{color:var(--ac);font-size:14px;margin-top:8px}
-.note{width:100%;margin-top:10px;background:#0f1216;border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:10px;min-height:44px}
-.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;background:var(--amb);color:#2a1d00;border-radius:6px;padding:2px 6px;margin-right:6px;vertical-align:2px}.age{color:var(--dim);font-weight:400;font-size:12px;margin-left:4px}
-.card.ok .acts{margin-top:8px}
-.empty{color:var(--dim);font-size:15px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:16px}
-.bots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.bot{display:flex;flex-direction:column;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 8px;min-height:60px;min-width:0;text-decoration:none;color:var(--tx)}
-.bot b{font-size:13px;font-weight:600;line-height:1.15}.bot span{font-size:11px;color:var(--dim);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
-.g{background:var(--ac)}.a{background:var(--amb)}.r{background:var(--red)}.n{background:#4a535c}
-.stop{display:flex;align-items:center;gap:6px}.stop .who{flex:1;min-width:0}.stop .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stop .who b em{font-style:normal;color:var(--ac);margin-right:6px}
-.stop .who span{display:block;color:var(--dim);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ib{width:42px;height:44px;border-radius:12px;background:#1d232a;font-size:17px;flex:none}[hidden]{display:none!important}.ib.dn{background:#1d232a;color:var(--ac);width:auto;padding:0 10px;font-weight:700;font-size:14px}.okm2{color:var(--ac);font-size:13px;margin-top:6px}.stop.fin{border-color:rgba(127,227,196,.5);flex-wrap:wrap}.wk .row{padding:9px 2px}
-.ib.go{background:var(--ac);color:#06231b;width:56px;font-weight:700;font-size:15px}
-.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:8px;max-width:520px;margin:0 auto}
-.bar input{flex:1;min-height:50px;border-radius:25px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;padding:0 18px;font-size:16px}
-.bar button{width:50px;height:50px;border-radius:25px;background:var(--card);border:1px solid var(--line);font-size:18px}.bar .send{background:var(--ac);color:#06231b;border:0}
-.more{display:block;width:100%;min-height:44px;margin-top:10px;border-radius:14px;border:1px solid var(--line);color:var(--dim);font-weight:600}
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 80px);transform:translateX(-50%);background:#20262d;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:50}
-.toast.on{opacity:1}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9}.sheet.on{display:block}body.lock{overflow:hidden}.xbtn{position:sticky;top:0;float:right;z-index:2;width:40px;height:40px;margin:-2px -6px 0 0;border-radius:20px;background:#2a3038;color:#fff;font-size:20px;line-height:40px;text-align:center;border:0}
-.sheet{overscroll-behavior:contain}.sheet>div{touch-action:pan-y;position:absolute;left:0;right:0;bottom:0;max-height:86vh;max-height:calc(90dvh - env(safe-area-inset-top));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;transition:transform .2s;background:#101317;border-radius:22px 22px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom) + 20px);max-width:520px;margin:0 auto}
-.grab{width:40px;height:5px;border-radius:3px;background:#333b44;margin:4px auto 10px}
-.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kv div{background:var(--card);border-radius:12px;padding:10px;text-align:center}
-.kv b{display:block;font-size:20px}.kv span{font-size:11px;color:var(--dim)}
-.row{display:flex;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line);font-size:15px}.row span{color:var(--dim)}
-a.lnk{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;background:var(--card);border-radius:12px;margin-bottom:8px;color:var(--tx);text-decoration:none}
-label{font-size:13px;color:var(--dim)}.in{width:100%;min-height:44px;margin:4px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--tx);font:inherit;padding:0 12px}
-</style></head><body>
-<div class="top">
-  <div class="ring"><svg width="64" height="64"><circle cx="32" cy="32" r="27" stroke="#1d232a" stroke-width="6" fill="none"/><circle id="arc" cx="32" cy="32" r="27" stroke="#7fe3c4" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/></svg><b id="score">–</b></div>
-  <div class="next"><small>Next move</small><div id="nextLine">Loading…</div></div>
-  <button class="gear" id="gear" aria-label="Settings">⚙︎</button>
-</div>
-<div class="live" id="live">● Offline snapshot</div>
-
-<h2><span>Needs you</span><span id="needCnt"></span></h2>
-<div id="needs"></div>
-
-<div id="wkTop" hidden><h2><span>This week</span></h2><div id="wkCard"></div></div>
-
-<h2><span>Today</span><span id="dayLbl"></span></h2>
-<div id="today"></div>
-
-<h2><span>Your bots</span></h2>
-<div class="bots" id="bots"></div>
-
-<button class="more" id="moreBtn">More ▾</button>
-
-<form class="bar" id="bar" autocomplete="off">
-  <input id="cmd" placeholder="Tell your bots… (@seo, @money)" enterkeyhint="send">
-  <button type="button" id="mic" aria-label="Dictate">🎙</button>
-  <button class="send" aria-label="Send">↑</button>
-</form>
-<div class="toast" id="toast"></div>
-
-<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="sheetBox">
-  <button class="xbtn" id="xSheet" aria-label="Close">✕</button>
-  <div class="grab"></div>
-  <h2 style="margin-top:4px"><span>This week</span></h2>
-  <div class="kv" id="nums"></div>
-  <h2><span>Week plan</span></h2><div id="wkSheet"></div>
-  <h2><span>Pipeline</span></h2><div id="pipe"></div>
-  <h2><span>More waiting</span></h2><div id="overflow"></div>
-  <h2><span>Weekly reset</span></h2>
-  <div class="card"><div class="d" style="-webkit-line-clamp:unset">Set your top 3 for the week. Sends to Head Honcho.</div>
-    <input class="in" id="t1" placeholder="1."><input class="in" id="t2" placeholder="2."><input class="in" id="t3" placeholder="3.">
-    <div class="acts"><button class="pri" id="sendTop">Send top 3</button></div></div>
-  <h2><span>Apps</span></h2>
-  <a class="lnk" href="https://admin.rbermanelectric.com">Copilot app<span>↗</span></a>
-  <a class="lnk" href="classic/">Classic Mission Control<span>↗</span></a>
-  <h2><span>Ops Board link</span><span id="connState"></span></h2>
-  <label>Script URL</label><input class="in" id="suUrl" placeholder="https://script.google.com/macros/s/…/exec">
-  <label>PIN</label><input class="in" id="suPin" type="password" inputmode="numeric">
-  <div class="acts"><button class="pri" id="suSave">Connect</button><button id="suClear">Disconnect</button></div>
-  <button class="more" id="closeSheet">Close</button>
-</div></div>
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 44px) 24px calc(env(safe-area-inset-bottom) + 90px)}
+h1{font-size:34px;font-weight:600;margin:0 0 8px;letter-spacing:-.5px}
+.calm{font-size:21px;color:var(--dim);margin:0 0 44px;transition:opacity .3s}
+h2{font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin:0 0 14px}
+section{margin-bottom:40px}
+.c{background:var(--card);border-radius:20px;padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);
+  overflow:hidden;transition:opacity .45s ease,transform .45s ease,max-height .45s ease .25s,margin .45s ease .25s,padding .45s ease .25s;max-height:220px}
+.c.gone{opacity:0;transform:translateY(8px) scale(.98);max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0}
+.c .tx{flex:1;min-width:0}.c b{display:block;font-weight:600}.c span.s{color:var(--dim);font-size:17px}
+.tm{font-size:15px;color:var(--sage);font-weight:600;display:block;margin-bottom:2px}
+button,a.bt{appearance:none;border:0;background:var(--sageL);color:var(--sageD);font:600 17px -apple-system,system-ui,sans-serif;padding:12px 18px;border-radius:14px;text-decoration:none;white-space:nowrap;cursor:pointer;min-width:84px;text-align:center;transition:background .25s,color .25s}
+button:active,a.bt:active{transform:scale(.97)}
+button.chk{background:var(--sage);color:#fff}
+.ck{display:inline-block;width:22px;height:22px;vertical-align:-5px}
+.ck path{stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;animation:dr .4s ease forwards}
+@keyframes dr{to{stroke-dashoffset:0}}
+.empty{color:var(--dim);font-size:19px;padding:8px 2px}
+.more{background:none;color:var(--dim);font-weight:500;font-size:16px;padding:6px 2px;min-width:0}
+.note{color:var(--dim);font-size:15px;margin:-6px 4px 14px}
+#doneSec{display:none}#doneSec h2{color:var(--faint)}
+.dl{color:var(--faint);font-size:17px;padding:6px 2px;text-decoration:line-through;text-decoration-color:#d6d0c6;animation:fi .5s ease}
+.dl:before{content:"✓  ";color:var(--sage);text-decoration:none;display:inline-block;margin-right:4px}
+@keyframes fi{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translate(-50%,30px);opacity:0;background:#3a3936;color:#f6f3ee;padding:12px 16px 12px 20px;border-radius:16px;font-size:16px;display:flex;gap:14px;align-items:center;transition:all .3s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast button{background:none;color:#cfe5da;padding:4px 6px;min-width:0;font-size:16px}
+#st{text-align:center;font-size:13px;color:var(--faint);margin-top:30px}#st a{color:var(--faint)}
+#pin{display:none;margin:0 0 30px}#pin p{color:var(--dim);margin:0 0 10px}#pin input{font-size:20px;padding:12px;border-radius:12px;border:1px solid #ddd;width:140px;background:#fff}
+</style></head><body><main>
+<h1 id="hi">Hello, Rob</h1><p class="calm" id="calm">Getting your day…</p>
+<div id="pin"><p>Enter your PIN once to connect.</p><input id="pinIn" inputmode="numeric" autocomplete="off" placeholder="PIN"> <button id="pinGo">Connect</button></div>
+<section><h2>Today</h2><div id="today"></div></section>
+<section><h2>Needs you</h2><div id="needs"></div></section>
+<section id="doneSec"><h2>Done today</h2><div id="done"></div></section>
+<div id="st"></div>
+</main><div id="toast"><span id="tmsg"></span><button id="undo">Undo</button></div>
 <script>
-(function(){
-'use strict';
-var BUILD='2026-10-16a';
-var $=function(i){return document.getElementById(i);};
+var BUILD='2026-10-16b';
+function $(i){return document.getElementById(i);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on');},2200);}
 function nyParts(d){var o={};new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).forEach(function(p){o[p.type]=p.value;});if(o.hour==='24')o.hour='00';return o;}
 function ymd(d){var p=nyParts(d);return p.year+'-'+p.month+'-'+p.day;}
-
-// ---- Ops Board bridge (same localStorage key as v1, so the phone stays connected) ----
+function go(u){window.location.href=u;}
 var CK='bermanMC.conn.v1';
 var DEFURL='https://script.google.com/macros/s/AKfycbzoPFbwX5PmnWAnU20oCdxXE_JZcLrXX5KTokAuokPCukl6ju7PGKb7UdspSbLI5AwSUQ/exec';
 function ckGet(){var m=/(?:^|; )mcpin=(\d+)/.exec(document.cookie);return m?m[1]:null;}
@@ -135,275 +73,105 @@ function api(body){var c=conn();if(!c)return Promise.reject(new Error('not conne
   return Promise.race([f,to])
    .then(function(r){return r.text();}).then(function(t){var j;try{j=JSON.parse(t);}catch(e){throw new Error('script not reachable');}return j;}).then(function(j){if(!j.ok)throw new Error(j.error||'failed');return j;});}
 
-// ---- Bots ----
-var CHAT='grokbot://app/v1/agent?id=';
-var BOTS=[
- {n:'Head Honcho',k:['head','honcho','hh'],own:/head honcho/i,link:'grokbot://app/v1'},
- {n:'Marketeer',k:['marketeer','mkt','marketing'],own:/marketeer/i,id:'c89a669a-fb80-4b52-b2da-09e4082c8fe1'},
- {n:'SEO & AEO',full:'SEO & AEO Desk',k:['seo','aeo'],own:/seo|aeo/i,id:'eea56f19-f007-4ef2-b739-42f87b1f0a01'},
- {n:'Money Man',k:['money','mm','finance'],own:/money/i,id:'31c31f89-9815-4682-abcb-5fe79899dcd4'},
- {n:'Video',full:'Video Creation Expert',k:['video'],own:/video/i,id:'b255c7ec-d31b-4256-9a17-feb358f3b1a1'},
- {n:'Music',full:'Music Maker',k:['music'],own:/music/i,id:'7bd8d175-8c10-4064-8b4b-24ca838d3ccd'},
- {n:'Diy Machine',k:['diy'],own:/diy/i,id:'b2436a77-9581-4fa3-8310-7edaa951ed53'}
-];
 
-// ---- Snapshot fallback (first names only, no addresses/phones/money) ----
-var SNAP={board:[
- {row:29,item:'Phil Fri job, 2 PM (Wading River)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job 2 PM today, Wading River (lighting). Tap Done after the job is finished.',due:'2026-10-16',updated:''},
- {row:28,item:'Karen Thu job, 1:30 PM (East Northport)',area:'Scheduling',owner:'Rob',status:'In progress',next:'Was yesterday. Tap Done if finished.',due:'2026-10-15',updated:''},
- {row:27,item:'Google reviews: 35 at 5.0 (was 33 before blast)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
- {row:30,item:'Timothy Wed job, 8 AM (East Islip)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Rewiring job Wed Oct 28, 8 AM to 4 PM',due:'2026-10-28',updated:''}
-],approvals:[]};
-var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
-var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
+var COPILOT='https://admin.rbermanelectric.com';
+var LK='bermanMC.last.v1',DK='bermanMC.done.v1';
+var S=null;try{S=JSON.parse(localStorage.getItem(LK));}catch(e){}
+// Done today (kept on this phone for the day) + items hidden while their save is pending/just finished
+var D={day:ymd(new Date()),list:[]};try{var d0=JSON.parse(localStorage.getItem(DK));if(d0&&d0.day===D.day)D=d0;}catch(e){}
+function saveD(){try{localStorage.setItem(DK,JSON.stringify(D));}catch(e){}}
+var HIDE={},NOTE={},showAll=false,started=0;
+D.list.forEach(function(x){HIDE[x.id]=1;});
 
-function stKey(x){x=String(x||'').toLowerCase();return /done/.test(x)?'done':/wait/.test(x)?'wait':/block/.test(x)?'block':/progress/.test(x)?'prog':'not';}
-function rows(){return (S.board||[]).filter(function(r){return r.item;});}
-
-// ---- Needs you: approvals first, then rows waiting on Rob ----
-var KEPT={}, SMSU={};  // KEPT: approved cards kept on screen after refresh; SMSU: id -> sms: url or 'none'
-function isLead(t){return /new lead/i.test(t||'');}
-function isText(t){return /\btext\b|lead reply/i.test(t||'')&&!/review request/i.test(t||'');}
-function nyMs(str){var m=String(str||'').match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/);if(!m)return NaN;
-  var now=new Date(),p=nyParts(now),off=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute)-Math.floor(now.getTime()/6e4)*6e4;
-  return Date.UTC(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0))-off;}
-function ago(str){var t=nyMs(str);if(isNaN(t))return '';var mn=Math.max(0,Math.round((Date.now()-t)/6e4));
-  return mn<60?mn+'m ago':mn<2880?Math.round(mn/60)+'h ago':Math.round(mn/1440)+'d ago';}
-function needs(){
-  var a=(S.approvals||[]).map(function(x){return {id:'A:'+x.id,kind:'appr',aid:x.id,t:x.title||x.id,d:x.draft||x.type||'',who:'Head Honcho',lead:isLead(x.type),text:isText(x.type),created:x.created||''};});
-  a=a.filter(function(x){return x.lead;}).sort(function(p,q){return (nyMs(q.created)||0)-(nyMs(p.created)||0);}).concat(a.filter(function(x){return !x.lead;}));
-  Object.keys(KEPT).forEach(function(k){if(!a.some(function(y){return y.id===k;}))a.unshift(KEPT[k]);});
-  var w=rows().filter(function(r){return stKey(r.status)==='wait'&&!/^APPROVAL /.test(r.item);})
-    .map(function(r){return {id:'R:'+r.row,kind:'row',row:r.row,item:r.item,t:r.item,d:r.next||'',who:r.owner||'Head Honcho'};});
-  return a.concat(w);
-}
-function cardHtml(x){
-  var L=local[x.id];
-  var head=(x.lead?'<span class="badge">NEW LEAD</span>':'')+esc(x.t)+(x.lead&&ago(x.created)?'<span class="age">'+esc(ago(x.created))+'</span>':'');
-  if(L){var U=SMSU[x.id];
-    return '<div class="card ok" data-id="'+esc(x.id)+'"><div class="t">'+head+'</div><div class="okm">✓ '+esc(L)+'</div>'+
-     (U&&U!=='none'&&U!=='wait'?'<div class="acts"><button class="pri" data-a="sms">💬 Text from my phone</button></div>':U==='none'?'<div class="okm" style="color:var(--dim)">No number on file</div>':'')+'</div>';}
-  return '<div class="card nc" data-id="'+esc(x.id)+'"><div class="tx"><div class="t">'+head+'</div>'+(x.d?'<div class="d">'+esc(x.d)+'</div>':'')+'</div>'+
-   '<div class="acts"><button data-a="note" aria-label="Note">✎</button><button class="pri" data-a="ok">'+(x.kind==='appr'?'Approve':'Done')+'</button></div></div>';
-}
-function renderNeeds(){
-  var N=needs(), open=N.filter(function(x){return !local[x.id];});
-  var top=N.slice(0,3);
-  $('needs').innerHTML=top.length?top.map(cardHtml).join(''):'<div class="empty">Nothing needs you. The crew is running.</div>';
-  $('needCnt').textContent=open.length?open.length+' open':'';
-  $('overflow').innerHTML=N.length>3?N.slice(3).map(cardHtml).join(''):'<div class="empty">Nothing else waiting.</div>';
-}
-function find(id){return needs().filter(function(x){return x.id===id;})[0];}
-function act(x,note){
-  var p;
-  if(x.kind==='appr'){
-    p=api({action:'approve',id:x.aid,status:note?'Changes':'Approved',note:note||''}).then(function(){
-      if(note)return 'Note sent. Head Honcho will revise.';
-      if(!x.text)return 'Approved. Head Honcho takes the next step; nothing is sent without you.';
-      KEPT[x.id]=x;SMSU[x.id]='wait';
-      api({action:'phone',id:x.aid}).then(function(j){
-        SMSU[x.id]='sms:'+String(j.phone).replace(/[^\d+]/g,'')+'&body='+encodeURIComponent(j.draft||'');local[x.id]='Approved. Messages opens with the text filled in.';render();go(SMSU[x.id]);
-      }).catch(function(err){SMSU[x.id]='none';local[x.id]='Approved.';render();if(/unknown action|approval not found/.test(err.message))toast('Texting needs the script update');});
-      return 'Approved. Getting the number…';});
-  } else if(note){
-    p=api({action:'ask',bot:x.who.split('/')[0].trim()||'Head Honcho',question:'[Re: '+x.item+'] '+note}).then(function(){return 'Note sent to '+(x.who||'Head Honcho')+'.';});
-  } else {
-    p=api({action:'done',item:x.item,row:x.row}).then(function(){return 'Marked done on the board.';});
-  }
-  return p.then(function(m){local[x.id]=m;render();toast('✓ Saved');refreshSoon();})
-   .catch(function(e){toast(/not connected/.test(e.message)?'Connect your Ops Board link in ⚙︎':'Didn\'t save: '+e.message);});
-}
-function onCardClick(e){
-  var b=e.target.closest('button[data-a]');if(!b)return;var c=b.closest('.card'),x=find(c.dataset.id);if(!x)return;
-  if(b.dataset.a==='ok') return act(x);
-  if(b.dataset.a==='sms'&&SMSU[x.id]&&/^sms:/.test(SMSU[x.id])) return go(SMSU[x.id]);
-  if(b.dataset.a==='note'){var t=c.querySelector('textarea');
-    if(!t){c.classList.remove('nc');t=document.createElement('textarea');t.className='note';t.placeholder='Your note…';c.insertBefore(t,c.querySelector('.acts'));b.textContent='Send note';b.className='pri';b.style.flex='1';t.focus();return;}
-    if(t.value.trim()) act(x,t.value.trim());}
-}
-$('needs').addEventListener('click',onCardClick);$('overflow').addEventListener('click',onCardClick);
-// Swipe right on a card = Approve / Done
-(function(){var sx=0,el=null;
- $('needs').addEventListener('touchstart',function(e){el=e.target.closest('.card');sx=e.touches[0].clientX;},{passive:true});
- $('needs').addEventListener('touchmove',function(e){if(!el)return;var dx=e.touches[0].clientX-sx;if(dx>0)el.style.transform='translateX('+Math.min(dx,120)+'px)';},{passive:true});
- $('needs').addEventListener('touchend',function(e){if(!el)return;var dx=e.changedTouches[0].clientX-sx;el.style.transform='';var x=find(el.dataset.id);if(dx>100&&x&&!local[x.id])act(x);el=null;});
-})();
-
-// ---- Score + single next action ----
-function score(){
-  var b={done:0,prog:0,wait:0,block:0,not:0},today=0,d=ymd(new Date());
-  rows().forEach(function(r){var k=stKey(r.status);b[k]++;if(k==='done'&&String(r.updated).indexOf(d)===0)today++;});
-  var tot=b.done+b.prog+b.wait+b.block+b.not||1;
-  today+=Object.keys(local).length;
-  return Math.max(0,Math.min(100,Math.round((b.done+.5*b.prog+.25*b.not)/tot*100+5*today)));
-}
-function nextLine(st){
-  var N=needs().filter(function(x){return !local[x.id];});
-  if(N.length) return N[0].lead?'Reply to new lead: '+N[0].t:N[0].kind==='appr'?'Approve: '+N[0].t:N[0].t;
-  if(st[0]) return st[0].name+' at '+st[0].time+(st[0].town?', '+st[0].town:'');
-  return 'You\'re clear. Tell a bot what\'s next.';
-}
-
-// ---- Today: next 2 appointments ----
-var TOWNS=['East Northport','Lake Ronkonkoma','Ronkonkoma','Islandia','East Setauket','Setauket','Centereach','Syosset','Wading River','Stony Brook','Port Jefferson','Smithtown','Hauppauge','Holbrook','Bohemia','Sayville','Patchogue','Medford','Selden','Coram','Lake Grove','Commack','Huntington','Northport','Riverhead','Shoreham','Rocky Point','Miller Place','Mount Sinai','Holtsville','Farmingville','Bay Shore','Islip','Brentwood','Deer Park','Babylon','Lindenhurst','Massapequa','Melville','Dix Hills','Kings Park','St. James','Nesconset'];
-var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-function townOf(t){var best='';TOWNS.forEach(function(w){if(t.indexOf(w)>=0&&w.length>best.length)best=w;});return best;}
-function stopOf(r){
-  var t=String(r.item||'')+' '+String(r.next||''),low=t.toLowerCase();
-  if(!/visit|job|appointment|install|service call|walkthrough/.test(low)||/^schedule /i.test(r.item)||stKey(r.status)==='done'&&!/job/.test(low))return null;
-  var tbd=/\btbd\b/i.test(r.item);
-  var tm=String(r.item).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i)||(!tbd&&t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i));if(!tm&&!tbd)return null;
-  var due=String(r.due||''),date=/^\d{4}-\d{2}-\d{2}/.test(due)?due.slice(0,10):'';
-  // A date-only cell read in UTC comes back as 7/8 PM ET the day before; shift it back.
-  if(date&&/ (19|20):00$/.test(due)){var dd=new Date(date+'T12:00:00Z');dd.setUTCDate(dd.getUTCDate()+1);date=dd.toISOString().slice(0,10);}
-  var dm=String(r.item).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i);
-  if(!date&&dm)date=nyParts(new Date()).year+'-'+String(MON[dm[1].toLowerCase()]).padStart(2,'0')+'-'+String(dm[2]).padStart(2,'0');
-  if(!date)return null;
-  var h=tm?+tm[1]%12+(/pm/i.test(tm[3])?12:0):0,m=tm?+(tm[2]||0):0;
-  var kind=/estimate/.test(low)?'Estimate':/job|install/.test(low)?'Job':'Visit';
-  var what=(String(r.item).match(/(solar|panel|ev charger|lighting|generator|doorbell|camera|fan|outlet)/i)||[])[1]||'';
-  return {row:r.row,item:r.item,name:String(r.item).split(/[\s(,:]/)[0],date:date,h:h,m:m,mins:tbd&&!tm?-1:h*60+m,tbd:tbd&&!tm,
-    time:tbd&&!tm?'Time TBD':(h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+' '+(h>=12?'PM':'AM'),town:townOf(t),kind:kind+(what?' · '+what.toLowerCase():''),st:stKey(r.status)};
-}
-function stops(){
-  var now=new Date(),td=ymd(now),tm=ymd(new Date(now.getTime()+864e5)),p=nyParts(now),nowM=+p.hour*60+ +p.minute;
-  return rows().map(stopOf).filter(function(x){return x&&x.st!=='done'&&(x.date===tm||x.date===td&&(x.tbd||x.mins+90>=nowM));})
-   .sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;}).slice(0,2)
-   .map(function(x){x.day=x.date===td?'':'Tmrw ';return x;});
-}
-var STOPS=[],FIN={};  // FIN: row -> green finish message
-function renderToday(){
-  STOPS=stops();
-  $('dayLbl').textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric'}).format(new Date());
-  $('today').innerHTML=STOPS.length?STOPS.map(function(x,i){
-    return '<div class="card stop'+(FIN[x.row]?' fin':'')+'" data-i="'+i+'"><div class="who"><b><em>'+esc(x.day+x.time)+'</em>'+esc(x.name)+'</b><span>'+esc(x.kind)+(x.town?' · '+esc(x.town):'')+'</span></div>'+
-     (FIN[x.row]||x.st==='done'?'':'<button class="ib dn" data-a="done" aria-label="Job done">Done</button>')+'<button class="ib" data-a="call" aria-label="Call">📞</button><button class="ib" data-a="sms" aria-label="Text">💬</button><button class="ib" data-a="cal" aria-label="Add to Calendar">📅</button><button class="ib go" data-a="go">Go</button>'+(FIN[x.row]?'<div class="okm2" style="flex-basis:100%">✓ '+esc(FIN[x.row])+'</div>':'')+'</div>';
-  }).join(''):'<div class="empty">Open road. Nothing booked next.</div>';
-}
-function go(url){window.location.href=url;}
-$('today').addEventListener('click',function(e){
-  var b=e.target.closest('button[data-a]');if(!b)return;var x=STOPS[+b.closest('.stop').dataset.i];if(!x)return;var a=b.dataset.a;
-  if(a==='done'){
-    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
-    b.disabled=true;b.textContent='…';
-    return api({action:'done',item:x.item,row:x.row,finish:true}).then(function(j){
-      FIN[x.row]=j.finished?(j.queued===false?'Marked done. Review text was already waiting.':'Marked done. Review text is waiting for your approval.'):'Marked done. Review text needs the script update.';
-      render();toast('✓ Saved');refreshSoon();
-    }).catch(function(err){b.disabled=false;b.textContent='Done';toast('Didn\'t save: '+err.message);});
-  }
-  if(a==='go'){
-    var fb=function(why){toast(why);go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'Long Island')+', NY'));};
-    if(!conn())return fb('Town only. Connect ⚙︎ for exact address.');
-    api({action:'address',row:x.row,item:x.item}).then(function(j){go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address));}).catch(function(err){fb('Town only ('+err.message+')');});
-  } else if(a==='call'||a==='sms'){
-    if(!conn())return toast('Connect your Ops Board link in ⚙︎');
-    api({action:'phone',row:x.row,item:x.item}).then(function(j){go((a==='call'?'tel:':'sms:')+String(j.phone).replace(/[^\d+]/g,''));})
-     .catch(function(err){toast(/unknown action/.test(err.message)?'Calling needs the script update':/no (number|phone)/.test(err.message)?'No number on file':'No number: '+err.message);});
-  } else if(a==='cal'){
-    if(x.tbd)return toast('Set the time first');
-    var p=function(n){return String(n).padStart(2,'0');},d=x.date.replace(/-/g,''),st=d+'T'+p(x.h)+p(x.m)+'00',eh=x.h+1;
-    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Berman//MC//EN','BEGIN:VEVENT','UID:mc-'+x.row+'-'+d+'@berman','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
-      'DTSTART;TZID=America/New_York:'+st,'DTEND;TZID=America/New_York:'+d+'T'+p(Math.min(eh,23))+p(eh>23?59:x.m)+'00','SUMMARY:'+x.name+' · '+x.kind,'LOCATION:'+(x.town?x.town+', NY':''),'END:VEVENT','END:VCALENDAR'].join('\r\n');
-    var u=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})),l=document.createElement('a');l.href=u;l.download=x.name+'.ics';document.body.appendChild(l);l.click();l.remove();
-  }
-});
-
-// ---- Weekly plan (Mondays on top; always in More) ----
-function weekPlan(){
-  var now=new Date(),p=nyParts(now),dow=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay(),mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day-((dow+6)%7)));
-  var from=mon.toISOString().slice(0,10),to=new Date(mon.getTime()+6*864e5).toISOString().slice(0,10);
-  var R=rows(),jobs=R.map(stopOf).filter(function(x){return x&&x.date>=from&&x.date<=to;}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.mins-b.mins;});
-  var leads=(S.approvals||[]).filter(function(x){return isLead(x.type);}).length+R.filter(function(r){return /new lead|schedule (an )?(estimate )?visit/i.test(r.item)&&stKey(r.status)!=='done';}).length;
-  var g=R.filter(function(r){return /marketeer|seo|aeo|video/i.test(r.owner||'')&&stKey(r.status)!=='done'&&stKey(r.status)!=='block';})[0];
-  var wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var jl=jobs.length?jobs.slice(0,6).map(function(x){var d=new Date(x.date+'T12:00:00Z');return '<div class="row">'+esc(wd[d.getUTCDay()]+' '+x.time+' · '+x.name)+'<span>'+esc(x.town||x.kind)+'</span></div>';}).join(''):'<div class="row">No jobs or visits on the board yet<span></span></div>';
-  var mv=g?'<div class="row">Growth move: '+esc(g.item)+'<span>'+esc(g.owner)+'</span></div>':'<a class="lnk" style="margin-top:8px" href="'+CHAT+BOTS[1].id+'">Ask Marketeer for this week\'s move<span>↗</span></a>';
-  return '<div class="card wk">'+jl+'<div class="row">Open leads<span>'+leads+'</span></div>'+mv+'</div>';
-}
-function renderWeek(){var h=weekPlan(),p=nyParts(new Date());$('wkSheet').innerHTML=h;
-  var mon=new Date(Date.UTC(+p.year,+p.month-1,+p.day)).getUTCDay()===1;$('wkTop').hidden=!mon;if(mon)$('wkCard').innerHTML=h;}
-
-// ---- Bot tiles ----
-function renderBots(){
-  var R=rows();
-  $('bots').innerHTML=BOTS.map(function(b){
-    var mine=R.filter(function(r){return b.own.test(r.owner||'')&&stKey(r.status)!=='done';});
-    var w=mine.filter(function(r){return stKey(r.status)==='wait';}).length,bl=mine.filter(function(r){return stKey(r.status)==='block';}).length,pr=mine.filter(function(r){return stKey(r.status)==='prog';}).length;
-    var dot=bl?'r':w?'a':mine.length?'g':'n',line=bl?'Blocked':w?'Needs you':pr?'Working':mine.length?mine.length+' queued':'Idle';
-    return '<a class="bot" href="'+(b.link||CHAT+b.id)+'"><b>'+esc(b.n)+'</b><span><i class="dot '+dot+'"></i>'+esc(line)+'</span></a>';
-  }).join('')+'<a class="bot" href="https://admin.rbermanelectric.com"><b>Copilot</b><span>Open app ↗</span></a>';
-}
-
-// ---- More sheet ----
-function renderMore(){
-  var R=rows(),wk=Date.now()-7*864e5,c={new:0,visit:0,est:0,won:0};
-  R.forEach(function(r){var l=String(r.item).toLowerCase();
-    if(/\bwon\b/.test(l))c.won++;else if(/estimate (follow|sent|out)/.test(l))c.est++;else if(/schedule (an )?(estimate )?visit|new lead/.test(l))c.new++;else if(/visit|walkthrough/.test(l))c.visit++;});
-  $('nums').innerHTML=[['New',c.new],['Visits',c.visit],['Estimates',c.est],['Won',c.won]].map(function(k){return '<div><b>'+k[1]+'</b><span>'+k[0]+'</span></div>';}).join('');
-  var L=R.filter(function(r){return /lead|visit|estimate|won|lost/i.test(r.item)&&stKey(r.status)!=='done';}).slice(0,8);
-  $('pipe').innerHTML=L.length?L.map(function(r){var k=stKey(r.status),nm=String(r.item).replace(/^Schedule (an )?(estimate )?visit:\s*/i,'').split(/[(:,]/)[0].trim()||r.item;
-    var why=(k==='block'||k==='wait'||/honcho/i.test(r.owner||''))&&r.next?'<div class="d" style="-webkit-line-clamp:2">'+(k==='block'?'Blocked: ':k==='wait'?'Waiting: ':'Next: ')+esc(String(r.next).replace(/^(blocked|waiting)( on)?:?\s*/i,function(m){return /on/i.test(m)?'on ':'';}))+'</div>':'';
-    return '<div class="card pl" data-row="'+esc(r.row)+'" data-item="'+esc(r.item)+'" data-who="'+esc(r.owner||'Head Honcho')+'"><div class="row" style="border:0;padding:0">'+esc(nm)+'<span>'+esc(r.status||'Not started')+'</span></div>'+why+
-      '<div class="acts"><button class="pri" data-pa="done">Done</button><button data-pa="ask">Tell Head Honcho</button></div></div>';}).join(''):'<div class="empty">No open leads on the board.</div>';
-  var c0=conn();$('connState').textContent=c0?'connected':'not connected';
-}
-function openSheet(){renderMore();$('sheet').classList.add('on');document.body.classList.add('lock');$('sheetBox').scrollTop=0;try{if(!history.state||!history.state.mcSheet)history.pushState({mcSheet:1},'');}catch(e){}}
-function closeSheet(fromPop){var sh=$('sheet');if(!sh.classList.contains('on'))return;sh.classList.remove('on');document.body.classList.remove('lock');$('sheetBox').style.transform='';if(!fromPop){try{if(history.state&&history.state.mcSheet)history.back();}catch(e){}}}
-window.addEventListener('popstate',function(){closeSheet(true);});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
-(function(){var b=null,y0=0,dy=0;document.addEventListener('DOMContentLoaded',function(){});var box=document.getElementById('sheetBox');
-box.addEventListener('touchstart',function(e){y0=e.touches[0].clientY;dy=0;b=box.scrollTop<=0;},{passive:true});
-box.addEventListener('touchmove',function(e){if(!b)return;dy=e.touches[0].clientY-y0;if(dy>0)box.style.transform='translateY('+dy+'px)';},{passive:true});
-box.addEventListener('touchend',function(){if(b&&dy>90)closeSheet();else box.style.transform='';b=null;});})();
-$('moreBtn').onclick=openSheet;$('xSheet').onclick=function(){closeSheet();};
-$('gear').onclick=function(){$('moreBtn').onclick();setTimeout(function(){$('suUrl').scrollIntoView({block:'center'});},50);};
-$('closeSheet').onclick=function(){closeSheet();};
-$('pipe').addEventListener('click',function(e){var b=e.target.closest('button[data-pa]');if(!b)return;var c=b.closest('.pl'),item=c.dataset.item,row=c.dataset.row,p;
-  if(b.dataset.pa==='done'){if(!confirm('Mark "'+item+'" done?'))return;p=api({action:'done',item:item,row:row}).then(function(){return '✓ Marked done';});}
-  else{var n=prompt('Message to Head Honcho about: '+item);if(!n||!n.trim())return;p=api({action:'ask',bot:'Head Honcho',question:'[Re: '+item+'] '+n.trim()}).then(function(){return '✓ Sent to Head Honcho';});}
-  b.disabled=true;var t=b.textContent;b.textContent='…';p.then(function(m){toast(m);refreshSoon();}).catch(function(err){toast('✗ '+err.message);}).then(function(){b.disabled=false;b.textContent=t;});});
-$('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))closeSheet();});
-$('sendTop').onclick=function(){var t=['t1','t2','t3'].map(function(i){return $(i).value.trim();}).filter(Boolean);if(!t.length)return toast('Add at least one');var b=$('sendTop');b.disabled=true;b.textContent='Sending…';
-  api({action:'ask',bot:'Head Honcho',question:'[Weekly reset] Top 3: '+t.map(function(v,i){return (i+1)+') '+v;}).join(' ')}).then(function(){['t1','t2','t3'].forEach(function(i){$(i).value='';});toast('✓ Top 3 sent to Head Honcho');}).catch(function(e){toast('✗ Not sent: '+e.message);}).then(function(){b.disabled=false;b.textContent='Send top 3';});};
-$('suSave').onclick=function(){var u=$('suUrl').value.trim(),p=$('suPin').value.trim();
-  if(!u)u=DEFURL;if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u))return toast('URL must end with /exec');if(p.length<4)return toast('Enter your PIN');
-  saveConn({url:u||DEFURL,pin:p});api({action:'ping'}).then(function(){toast('✓ Connected');renderMore();refresh();}).catch(function(e){toast(e.message);});};
-$('suClear').onclick=function(){if(!confirm('Disconnect Mission Control from your board?'))return;localStorage.removeItem(CK);document.cookie='mcpin=; max-age=0; path=/';try{indexedDB.deleteDatabase('mc');}catch(e){}renderMore();toast('Disconnected');};
-
-// ---- Command bar: sends to Inbox via 'ask', optional @bot routing ----
-function route(q){var m=q.match(/^@(\w+)\s*/);if(!m)return {bot:'Head Honcho',q:q};var k=m[1].toLowerCase();
-  var b=BOTS.filter(function(b){return b.k.indexOf(k)>=0||b.n.toLowerCase().indexOf(k)===0;})[0];return {bot:b?(b.full||b.n):'Head Honcho',q:q.slice(m[0].length)};}
-$('bar').onsubmit=function(e){e.preventDefault();var v=$('cmd').value.trim();if(!v)return;var r=route(v);
-  api({action:'ask',bot:r.bot,question:r.q}).then(function(){$('cmd').value='';$('cmd').blur();toast('✓ Sent to '+r.bot);refreshSoon();})
-   .catch(function(err){toast(/not connected/.test(err.message)?'Connect your Ops Board link in ⚙︎':'Not sent: '+err.message);});};
-$('mic').onclick=function(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){$('cmd').focus();return toast('Tap 🎤 on your keyboard to dictate');}
-  var r=new SR();r.lang='en-US';r.interimResults=false;r.onresult=function(e){$('cmd').value=e.results[0][0].transcript;};r.onerror=function(){toast('Mic unavailable, use keyboard 🎤');};r.start();toast('Listening…');};
-
-// ---- Render + live refresh ----
+function st(x){x=String(x||'').toLowerCase();return /done|cancel/.test(x)?'done':/wait/.test(x)?'wait':/progress/.test(x)?'prog':'other';}
+function first(t){return String(t||'').split(/[\s(,:']/)[0];}
+function town(t){var m=String(t).match(/\(([^)]+)\)/);return m?m[1]:'';}
+function timeOf(t){var m=String(t).match(/\b(\d{1,2}(?::\d{2})?\s*(AM|PM))\b/i);return m?m[1].toUpperCase():'Time TBD';}
+function what(t){var m=String(t).match(/\b(lighting|rewiring|panel|ev charger|generator|doorbell|camera|fan|outlet|solar|wiring|estimate)\b/i);return m?m[1].toLowerCase():'job';}
+var DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function dayWord(iso){if(!iso)return '';var t=ymd(new Date()),tm=ymd(new Date(Date.now()+864e5));if(iso===t)return 'today’s';if(iso===tm)return 'tomorrow’s';
+  return DOW[new Date(iso+'T12:00:00Z').getUTCDay()]+'’s';}
+function apprDate(a){var m=String(a.title).match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/i),y=nyParts(new Date()).year;
+  if(m)return y+'-'+String(MON[m[1].toLowerCase()]).padStart(2,'0')+'-'+String(m[2]).padStart(2,'0');
+  var c=String(a.created||'').slice(0,10);if(/tomorrow/i.test(a.title)&&c){var d=new Date(c+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);return d.toISOString().slice(0,10);}
+  if(/today/i.test(a.title))return c;return '';}
+function isJob(r){return /\b(job|visit|walkthrough|appointment)\b/i.test(r.item)&&!/^schedule /i.test(r.item)&&/rob/i.test(r.owner||'')&&st(r.status)!=='done';}
+function jobs(){var d=ymd(new Date());return (S&&S.board||[]).filter(function(r){return isJob(r)&&String(r.due||'').slice(0,10)===d;})
+  .map(function(r){return {id:'J:'+r.row,row:r.row,item:r.item,next:r.next,label:first(r.item)+'’s '+what(r.item+' '+r.next),kind:'job'};})
+  .sort(function(a,b){return mins(a.item)-mins(b.item);});}
+function mins(t){var m=String(t).match(/\b(\d{1,2})(?::(\d{2}))?\s*(AM|PM)\b/i);return m?(+m[1]%12+(/pm/i.test(m[3])?12:0))*60+ +(m[2]||0):9999;}
+function needs(){var out=[],d=ymd(new Date());if(!S)return out;
+  (S.approvals||[]).filter(function(a){return /pending/i.test(a.status);}).forEach(function(a){var n=first(a.title),ty=String(a.type||''),t,btn='Send text';
+    if(/confirm/i.test(ty)){var w=dayWord(apprDate(a));t='Confirm '+(w?w+' ':'')+'job with '+n;}
+    else if(/new lead/i.test(ty))t='Reply to '+n+', a new customer';
+    else if(/follow/i.test(ty))t='Check in with '+n+' about the estimate';
+    else if(/review request/i.test(ty)){t='Ask '+(/past customers/i.test(a.title)?'past customers':n)+' for a review';btn='Approve';}
+    else if(/text/i.test(ty))t='Text '+n;
+    else{t=String(a.title).replace(/\s*\(.*?\)/g,'');btn='Approve';}
+    out.push({id:'A:'+a.id,aid:a.id,t:t,label:t.replace(/^Confirm/,'Confirmed').replace(/^Reply to (\w+).*/,'Replied to $1').replace(/^Check in/,'Checked in').replace(/^Text/,'Texted').replace(/^Ask/,'Asked'),btn:btn,kind:btn==='Send text'?'text':'appr'});});
+  (S.board||[]).forEach(function(r){var due=String(r.due||'').slice(0,10);
+    if(isJob(r)&&due&&due<d)out.push({id:'R:'+r.row,row:r.row,item:r.item,t:'Is '+first(r.item)+'’s job finished?',label:first(r.item)+'’s job',btn:'Done',kind:'done'});});
+  (S.board||[]).filter(function(r){return st(r.status)==='wait'&&/rob/i.test(r.owner||'');}).forEach(function(r){
+    if(/estimate/i.test(r.area||'')||/estimate/i.test(r.item))out.push({id:'R:'+r.row,t:'Review '+first(r.item)+'’s estimate',btn:'Review',href:COPILOT,kind:'link'});
+    else out.push({id:'R:'+r.row,row:r.row,item:r.item,t:String(r.item).replace(/\s*\(.*?\)/g,''),label:String(r.item).replace(/\s*\(.*?\)/g,''),btn:'Done',kind:'done'});});
+  return out;}
+var CK_SVG='<svg class="ck" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function card(x){return '<div class="c" data-id="'+esc(x.id)+'">'+x.body+(x.href?'<a class="bt" href="'+esc(x.href)+'">'+esc(x.btn)+'</a>':'<button data-id="'+esc(x.id)+'">'+esc(x.btn)+'</button>')+'</div>'+(NOTE[x.id]?'<div class="note">'+esc(NOTE[x.id])+'</div>':'');}
+var CUR={};
 function render(){
-  var sc=score(),col=sc>=80?'#7fe3c4':sc>=50?'#9fd3ff':'#f2c46d';
-  $('score').textContent=sc;$('arc').style.strokeDashoffset=(169.6*(1-sc/100)).toFixed(1);$('arc').style.stroke=col;
-  renderNeeds();renderToday();renderBots();renderWeek();$('nextLine').textContent=nextLine(STOPS);
+  var h=+nyParts(new Date()).hour;$('hi').textContent=(h<5?'Hello':h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Rob';
+  var J=jobs().filter(function(x){return !HIDE[x.id];}),N=needs().filter(function(x){return !HIDE[x.id];});CUR={};
+  J.concat(N).forEach(function(x){CUR[x.id]=x;});
+  var n=J.length+N.length,did=D.list.length,W=['Nothing','One thing','Two things','Three things','Four things','Five things','Six things','Seven things'];
+  $('calm').textContent=!S?'Getting your day…':n===0?(did?'All done. Enjoy the day.':'Nothing needs you. Enjoy the day.'):did?(n===1?'One left. Nice.':n+' left. Nice pace.'):(W[n]||n+' things')+' today. You’re on track.';
+  $('today').innerHTML=J.length?J.map(function(x){x.body='<div class="tx"><span class="tm">'+esc(timeOf(x.item))+'</span><b>'+esc(first(x.item))+'</b><span class="s">'+esc(what(x.item+' '+x.next))+(town(x.item)?' · '+esc(town(x.item)):'')+'</span></div>';x.btn='Done';return card(x);}).join(''):'<div class="empty">No jobs today.</div>';
+  var top=showAll?N:N.slice(0,3);
+  $('needs').innerHTML=N.length?top.map(function(x){x.body='<div class="tx"><b>'+esc(x.t)+'</b></div>';return card(x);}).join('')+(N.length>3&&!showAll?'<button class="more" id="more">and '+(N.length-3)+' more</button>':''):'<div class="empty">Nothing needs you. Enjoy the day.</div>';
+  $('doneSec').style.display=did?'block':'none';$('done').innerHTML=D.list.map(function(x){return '<div class="dl">'+esc(x.label)+'</div>';}).join('');
 }
+// ---- Done flow: check, slide away, land in Done today; save after a 5s undo window ----
+var PEND=null;
+function toast(msg,undo){$('tmsg').textContent=msg;$('undo').style.display=undo?'':'none';$('toast').classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){$('toast').classList.remove('on');},undo?5000:3200);}
+function finish(x,btn,run,delay){
+  btn.disabled=true;btn.classList.add('chk');btn.innerHTML=CK_SVG;delete NOTE[x.id];
+  var el=btn.closest('.c');setTimeout(function(){el.classList.add('gone');},550);
+  setTimeout(function(){HIDE[x.id]=1;D.list.push({id:x.id,label:x.label||x.t});saveD();render();},1250);
+  var save=function(){run().then(function(){setTimeout(refresh,1500);}).catch(function(err){
+      delete HIDE[x.id];D.list=D.list.filter(function(y){return y.id!==x.id;});saveD();NOTE[x.id]='Couldn’t save that one. It’s back on your list.';render();});};
+  if(!delay){save();return;}
+  if(PEND)PEND.fire();
+  var tm=setTimeout(function(){PEND=null;save();},5000);
+  PEND={fire:function(){clearTimeout(tm);PEND=null;save();},undo:function(){clearTimeout(tm);PEND=null;delete HIDE[x.id];D.list=D.list.filter(function(y){return y.id!==x.id;});saveD();render();}};
+  toast('Done. Nice work.',true);
+}
+$('undo').onclick=function(){if(PEND)PEND.undo();$('toast').classList.remove('on');};
+document.addEventListener('click',function(e){
+  if(e.target.id==='more'){showAll=true;render();return;}
+  var b=e.target.closest('button[data-id]');if(!b||b.disabled)return;var x=CUR[b.dataset.id];if(!x)return;
+  if(!conn()){$('pin').style.display='block';$('pinIn').focus();return;}
+  if(x.kind==='job')return finish(x,b,function(){return api({action:'done',item:x.item,row:x.row,finish:true});},true);
+  if(x.kind==='done')return finish(x,b,function(){return api({action:'done',item:x.item,row:x.row});},true);
+  if(x.kind==='appr')return finish(x,b,function(){return api({action:'approve',id:x.aid,status:'Approved',note:''});},true);
+  if(x.kind==='text'){b.disabled=true;b.textContent='…';
+    api({action:'approve',id:x.aid,status:'Approved',note:''}).then(function(){return api({action:'phone',id:x.aid});}).then(function(j){
+      b.disabled=false;finish(x,b,function(){return Promise.resolve();},false);
+      go('sms:'+String(j.phone).replace(/[^\d+]/g,'')+'&body='+encodeURIComponent(j.draft||''));
+    }).catch(function(err){b.disabled=false;b.textContent='Send text';NOTE[x.id]='Couldn’t open the text just now. Try again in a moment.';render();});}
+});
+$('pinGo').onclick=function(){var v=$('pinIn').value.trim();if(v.length<4)return;saveConn({url:DEFURL,pin:v});$('pin').style.display='none';refresh();};
 var busy=false;
-function refresh(){
-  if(!conn()){render();return Promise.resolve();}
+function refresh(){var nd=ymd(new Date());if(D.day!==nd){D={day:nd,list:[]};HIDE={};saveD();}
+  render();if(!conn()){$('pin').style.display='block';return Promise.resolve();}
   if(busy)return Promise.resolve();busy=true;
-  var st=function(){return api({action:'state'});};
-  return st().catch(function(e){if(/not connected|PIN|pin/.test(e.message))throw e;return new Promise(function(r){setTimeout(r,2500);}).then(st);}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;live=true;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
-    var p=nyParts(new Date()),h=+p.hour;$('live').textContent='● Live · '+(h%12||12)+':'+p.minute+' '+(h>=12?'PM':'AM');$('live').className='live on';
-  }).catch(function(e){try{$('live').title=e&&e.message||'';}catch(_){}$('live').textContent=live?'● Offline, last update shown':S.at?'● Offline · last live '+S.at.slice(5):'● Offline snapshot';$('live').className='live';})
-   .then(function(){busy=false;render();});
-}
-var rt;function refreshSoon(){clearTimeout(rt);rt=setTimeout(refresh,1500);}
+  var s=function(){return api({action:'state'});};
+  return s().catch(function(e){if(/pin/i.test(e.message))throw e;return new Promise(function(r){setTimeout(r,2500);}).then(s);}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
+      $('st').innerHTML='<a href="classic/">Classic view</a>';})
+   .catch(function(e){$('st').innerHTML=(S?'Showing your last update · ':'Can’t reach your board right now · ')+'<a href="classic/">Classic view</a>';if(/pin/i.test(e.message))$('pin').style.display='block';})
+   .then(function(){busy=false;render();});}
 function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
   if(v&&v.build&&v.build!==BUILD){var k='bermanMC.reload';if(sessionStorage.getItem(k)===v.build)return;sessionStorage.setItem(k,v.build);location.reload();}}).catch(function(){});}
-try{if(/[?&]v=/.test(location.search))history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
 render();refresh();verCheck();
-setInterval(function(){if(!document.hidden)refresh();},60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden){refresh();verCheck();}});
 window.addEventListener('pageshow',function(e){if(e.persisted){busy=false;refresh();verCheck();}});
-window.addEventListener('online',function(){busy=false;refresh();});
-})();
+setInterval(function(){if(!document.hidden)refresh();},300000);
 </script></body></html>
