@@ -150,11 +150,13 @@ var BOTS=[
 // ---- Snapshot fallback (first names only, no addresses/phones/money) ----
 var SNAP={board:[
  {row:29,item:'Phil Fri job, 2 PM (Wading River)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Job was Fri Oct 16 at 2 PM, Wading River (lighting). Tap Done if it is finished.',due:'2026-10-16',updated:''},
- {row:27,item:'Google reviews: 36 at 5.0 (was 33 before blast)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
+ {row:27,item:'Google reviews: 36 at 5.0 (was 33 before blast; same as Oct 17)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
  {row:37,item:'Invoice Kathy',area:'Billing',owner:'Rob',status:'Not started',next:'Send invoice for finished job',due:'',updated:''},
  {row:38,item:'Invoice Abhik',area:'Billing',owner:'Rob',status:'Not started',next:'Send invoice for finished job',due:'',updated:''},
  {row:30,item:'Timothy Wed job, 8 AM (East Islip)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Rewiring job Wed Oct 28, 8 AM to 4 PM',due:'2026-10-28',updated:''}
-],approvals:[]};
+],approvals:[
+ {id:'A9',type:'Estimate follow-up',title:'Jeanie: estimate check-in',draft:'Check-in text about the estimate, ready for your OK.',created:'2026-10-17'}
+]};
 var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
 var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
 
