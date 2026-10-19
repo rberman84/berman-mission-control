@@ -67,7 +67,7 @@ function api(body){var c=conn();if(!c)return Promise.reject(new Error('not conne
 
 
 
-var COPILOT='https://admin.rbermanelectric.com',TT='https://www.thumbtack.com/';
+var COPILOT='https://admin.rbermanelectric.com',TT='https://www.thumbtack.com/pro-leads';
 var LK='bermanMC.last.v6',HK='bermanMC.hide.v6';
 var S=null;try{S=JSON.parse(localStorage.getItem(LK));}catch(e){}
 var HIDE={};try{var h0=JSON.parse(localStorage.getItem(HK));if(h0&&h0.day===ymd(new Date()))HIDE=h0.ids||{};}catch(e){}
