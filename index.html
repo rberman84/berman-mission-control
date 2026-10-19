@@ -29,7 +29,7 @@ h2 i{font-style:normal}
 .pill.old{background:#fbe9e7;color:var(--r)}.sm{border:0;border-radius:10px;padding:9px 11px;font-weight:600;font-size:14px;background:var(--gs);color:var(--g);font-family:inherit;text-decoration:none;cursor:pointer}
 .sm.s{background:#efeee9;color:#45494e}
 .ex{flex-basis:100%}
-.gone{opacity:.3;pointer-events:none}
+.gone{opacity:.3;pointer-events:none}button:disabled{opacity:.6}
 .foot{text-align:center;color:var(--dim);font-size:12.5px;margin-top:26px}.foot a{color:var(--dim)}
 details summary{color:var(--dim);font-size:14px;cursor:pointer;padding:8px 2px}
 .empty{color:var(--dim);font-size:15px}
@@ -39,12 +39,11 @@ details summary{color:var(--dim);font-size:14px;cursor:pointer;padding:8px 2px}
 <div id="pin"><p style="margin:0 0 10px">Enter your PIN once to connect.</p><input id="pinIn" inputmode="numeric" autocomplete="off" placeholder="PIN"> <button class="sm" id="pinGo">Connect</button></div>
 <div id="app"></div><p class="foot" id="st"></p></main><div id="toast"></div>
 <script>
-var BUILD='v6-20261019';
+var BUILD='v7-20261019';
 function $(i){return document.getElementById(i);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function nyParts(d){var o={};new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).forEach(function(p){o[p.type]=p.value;});if(o.hour==='24')o.hour='00';return o;}
 function ymd(d){var p=nyParts(d);return p.year+'-'+p.month+'-'+p.day;}
-function go(u){window.location.href=u;}
 var CK='bermanMC.conn.v1';
 var DEFURL='https://script.google.com/macros/s/AKfycbzoPFbwX5PmnWAnU20oCdxXE_JZcLrXX5KTokAuokPCukl6ju7PGKb7UdspSbLI5AwSUQ/exec';
 function ckGet(){var m=/(?:^|; )mcpin=(\d+)/.exec(document.cookie);return m?m[1]:null;}
@@ -67,14 +66,14 @@ function api(body){var c=conn();if(!c)return Promise.reject(new Error('not conne
 
 
 
-var COPILOT='https://admin.rbermanelectric.com',TT='https://www.thumbtack.com/';
-var LK='bermanMC.last.v6',HK='bermanMC.hide.v6';
+var COPILOT='https://admin.rbermanelectric.com',TT='https://www.thumbtack.com/pro-leads';
+var LK='bermanMC.last.v6',HK='bermanMC.hide.v7';
 var S=null;try{S=JSON.parse(localStorage.getItem(LK));}catch(e){}
-var HIDE={};try{var h0=JSON.parse(localStorage.getItem(HK));if(h0&&h0.day===ymd(new Date()))HIDE=h0.ids||{};}catch(e){}
-function saveHide(){try{localStorage.setItem(HK,JSON.stringify({day:ymd(new Date()),ids:HIDE}));}catch(e){}}
+var HIDE={};try{var h0=JSON.parse(localStorage.getItem(HK))||{};Object.keys(h0).forEach(function(k){if(Date.now()-h0[k]<14*864e5)HIDE[k]=h0[k];});}catch(e){}
+function saveHide(){try{localStorage.setItem(HK,JSON.stringify(HIDE));}catch(e){}}
 var EXTRA={},HIDE472={};// per-card extra content (number / nudge draft)
-function toast(m){var e=$('toast');e.textContent=m;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.opacity=0;},1800);}
-function copyText(s){var ok=false;
+function toast(m){var e=$('toast');e.textContent=m;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(function(){e.style.opacity=0;},2600);}
+function copyText(s,b){var ok=false;if(b){var l0=b.textContent;setTimeout(function(){b.textContent='Copied ✓';setTimeout(function(){b.textContent=l0;},1800);},0);}
   try{var ta=document.createElement('textarea');ta.value=s;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='0';ta.style.opacity='0';ta.style.fontSize='16px';document.body.appendChild(ta);
     var r=document.createRange();r.selectNodeContents(ta);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);ta.setSelectionRange(0,s.length);ok=document.execCommand('copy');ta.remove();sel.removeAllRanges();}catch(e){}
   if(!ok&&navigator.clipboard){navigator.clipboard.writeText(s).then(function(){toast('Copied');},function(){toast('Press and hold the text to copy');});return;}
@@ -89,9 +88,9 @@ function first(t){return String(t||'').split(/[\s(,:']/)[0];}
 function town(t){var m=String(t).match(/\(([^)]+)\)/);return m?m[1]:'';}
 var ACT={},AID=0;function act(fn){var k='a'+(++AID);ACT[k]=fn;return k;}
 function btn(cls,label,fn){return '<button class="'+cls+'" data-a="'+act(fn)+'">'+esc(label)+'</button>';}
-function link(cls,label,href){return '<a class="'+cls+'" href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(label)+'</a>';}
+function link(cls,label,href){return '<a class="'+cls+' out" href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(label)+' ↗</a>';}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-a]');if(!b)return;var f=ACT[b.getAttribute('data-a')];if(f){e.preventDefault();f(b);}});
-function hide(id,msg){HIDE[id]=1;saveHide();toast(msg||'Done');render();}
+function hide(id,msg){HIDE[id]=Date.now();saveHide();if(msg)toast(msg);render();}
 function unhide(id,msg){delete HIDE[id];saveHide();toast(msg);render();}
 
 // ---------- build the model (v6 shape, with fallback to the old shape) ----------
@@ -109,10 +108,11 @@ function model(){var M={leads:[],jobs:[],uninv:[],drafts:[],waiting:[],never:[],
     (C.waiting||[]).forEach(function(l){M.waiting.push({id:'W:'+l.lead_id,first:l.first,svc:l.service,town:l.town,days:l.days,lead_id:l.lead_id,is472:l.is472,followed:l.followed});});
     (C.neverBooked||[]).forEach(function(l){if(M.leads.some(function(x){return x.first===l.first;}))return;M.never.push({id:'N:'+l.lead_id,first:l.first,svc:l.service,town:l.town,days:l.days,lead_id:l.lead_id,is472:l.is472,followed:l.followed});});
   } else {// old script: board only
+    var invd={};(S.board||[]).forEach(function(r){var m=/^(?:Invoiced|Followed up): ([A-Za-z\-']+)/.exec(String(r.item));if(m)invd[m[1]]=1;});
     (S.board||[]).forEach(function(r){var it=String(r.item),due=String(r.due||'').slice(0,10),done=/done|cancel/i.test(r.status);
       var jm=/^([A-Z][a-z]+)\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*\s+job,?\s*([^()]*)\(?([^)]*)\)?/.exec(it);
       if(jm&&!done&&due>=today)M.jobs.push({id:'J:'+r.row,row:r.row,item:r.item,first:jm[1],town:jm[3],date:due,timeTxt:jm[2].trim(),svc:''});
-      if(jm&&done&&due&&due<today&&(Date.now()-Date.parse(due))<14*864e5)M.uninv.push({id:'U:'+jm[1],first:jm[1],town:jm[3],days:Math.floor((Date.now()-Date.parse(due))/864e5)});
+      if(jm&&done&&!invd[jm[1]]&&due&&due<today&&(Date.now()-Date.parse(due))<14*864e5)M.uninv.push({id:'U:'+jm[1],first:jm[1],town:jm[3],days:Math.floor((Date.now()-Date.parse(due))/864e5)});
       var em=/^([A-Z][a-z]+): review estimate/.exec(it);if(em&&/wait/i.test(r.status))M.drafts.push({id:'D:'+r.row,first:em[1],svc:''});});}
   M.jobs.sort(function(a,b){return (a.date+(a.start||''))<(b.date+(b.start||''))?-1:1;});
   M.leads.sort(function(a,b){return (b.hours||0)-(a.hours||0);});
@@ -120,33 +120,38 @@ function model(){var M={leads:[],jobs:[],uninv:[],drafts:[],waiting:[],never:[],
   return M;}
 
 // ---------- actions ----------
-function doSent(x){hide(x.id,'Marked sent');
-  var p=x.aid?api({action:'sent',id:x.aid}).catch(function(e){if(/unknown action/.test(e.message))return api({action:'approve',id:x.aid,status:'Approved',note:'Sent by Rob (Mission Control)'});throw e;})
-    :api({action:'sent',lead_id:x.lead_id,first:x.first});
-  p.catch(function(){unhide(x.id,'Couldn’t save that. It’s back on your list.');});}
-function doLost(x){if(!confirm('Close out '+x.first+'? This only hides it here. Nobody gets contacted, and Copilot isn’t changed.'))return;hide(x.id,'Closed out');
-  api({action:'marklost',lead_id:x.lead_id,estimate_id:x.est,first:x.first}).catch(function(){unhide(x.id,'Couldn’t save that. It’s back on your list.');});}
-function doInvoiced(x){hide(x.id,'Marked invoiced');api({action:'sent',lead_id:'inv-'+x.first,first:x.first}).catch(function(e){if(!/unknown action/.test(e.message))unhide(x.id,'Couldn’t save that. It’s back on your list.');});}
-function doNudge(x,kind,b){b.textContent='…';api({action:'nudge',lead_id:x.lead_id,kind:kind}).then(function(j){EXTRA[x.id]={draft:j.draft,phone:j.phone,is472:j.is472};render();})
-  .catch(function(e){b.textContent='Nudge';toast(/unknown action/.test(e.message)?'Nudge needs the v6 script update.':'Couldn’t load a draft just now.');});}
-function doNumber(x,b){b.textContent='…';api({action:'phone',id:x.aid}).then(function(j){if(/^\+?1?472/.test(String(j.phone).replace(/[^\d+]/g,''))){x.is472=true;HIDE472[x.id]=1;toast('That’s a Thumbtack 472 number. Reply in Thumbtack.');render();return;}EXTRA[x.id]=Object.assign(EXTRA[x.id]||{},{phone:j.phone});render();})
-  .catch(function(e){b.textContent='Show number';toast(/no number/.test(e.message)?'No number on file. Use Thumbtack.':'Couldn’t get the number just now.');});}
-function doNav(x,b){b.textContent='…';var p=x.est?api({action:'jobaddr',estimate_id:x.est}):api({action:'address',row:x.row,item:x.item});
-  p.then(function(j){b.textContent='Navigate';go('https://maps.apple.com/?daddr='+encodeURIComponent(j.address));})
-   .catch(function(){b.textContent='Navigate';go('https://maps.apple.com/?daddr='+encodeURIComponent((x.town||'')+', NY'));});}
+function busyBtn(b,t){if(b){b.dataset.l=b.dataset.l||b.textContent;b.textContent=t||'…';b.disabled=true;}}
+function freeBtn(b){if(b&&b.dataset.l){b.textContent=b.dataset.l;b.disabled=false;}}
+function save(x,label,req,fallback){hide(x.id,'Saving…');
+  api(req).catch(function(e){if(fallback&&/unknown action/.test(e.message))return api(fallback);throw e;})
+   .then(function(){toast(label+' ✓ Saved');},function(){unhide(x.id,'Couldn’t save that. It’s back on your list. Try again.');});}
+function doSent(x){save(x,'Marked sent',x.aid?{action:'sent',id:x.aid}:{action:'sent',lead_id:x.lead_id,first:x.first},x.aid?{action:'approve',id:x.aid,status:'Approved',note:'Sent by Rob (Mission Control)'}:null);}
+function doLost(x){if(!confirm('Close out '+x.first+'? This only hides it here. Nobody gets contacted, and Copilot isn’t changed.'))return;
+  save(x,'Closed out',{action:'marklost',lead_id:x.lead_id,estimate_id:x.est,first:x.first});}
+function doInvoiced(x){save(x,'Marked invoiced',{action:'sent',lead_id:'inv-'+x.first,first:x.first});}
+function doNudge(x,kind,b){busyBtn(b,'Loading…');api({action:'nudge',lead_id:x.lead_id,kind:kind}).then(function(j){EXTRA[x.id]={draft:j.draft,phone:j.phone,is472:j.is472};render();})
+  .catch(function(e){freeBtn(b);toast(/unknown action/.test(e.message)?'Nudge needs the script update.':'Couldn’t load a draft just now. Try again.');});}
+function doNumber(x,b){busyBtn(b,'Loading…');api({action:'phone',id:x.aid}).then(function(j){if(/^\+?1?472/.test(String(j.phone).replace(/[^\d+]/g,''))){x.is472=true;HIDE472[x.id]=1;toast('That’s a Thumbtack 472 number. Reply in Thumbtack.');render();return;}EXTRA[x.id]=Object.assign(EXTRA[x.id]||{},{phone:j.phone});render();})
+  .catch(function(e){freeBtn(b);toast(/no number/.test(e.message)?'No number on file. Use Thumbtack.':'Couldn’t get the number just now. Try again.');});}
+// Address: shown INSIDE the page (with Copy + Maps ↗), so tapping never leaves Mission Control.
+function doAddr(x,b){busyBtn(b,'Loading…');var p=x.est?api({action:'jobaddr',estimate_id:x.est}):x.row?api({action:'address',row:x.row,item:x.item}):Promise.reject(new Error('none'));
+  p.then(function(j){EXTRA[x.id]={addr:j.address};render();})
+   .catch(function(){EXTRA[x.id]={addr:(x.town?x.town+', NY':''),townOnly:true};render();});}
 
 // ---------- render ----------
-function extraHtml(x){var e=EXTRA[x.id];if(!e)return '';var o='<div class="ex">';
-  if(e.draft)o+='<div class="q">'+esc(e.draft)+'</div><div class="row">'+btn('bt','Copy text',function(){copyText(e.draft);})+(e.is472||!e.phone?link('bt','Open Thumbtack',TT):'')+'</div>';
-  if(e.phone)o+='<div class="row" style="align-items:center"><span style="flex:1;font-weight:600">Text to '+esc(fmtPhone(e.phone))+'</span>'+btn('sm s','Copy number',function(){copyText(fmtPhone(e.phone));})+'</div>';
+function addrHtml(x){var e=EXTRA[x.id];if(!e||e.addr==null)return '';if(!e.addr)return '<div class="w">No address on file. Check Copilot.</div>';
+  return '<div class="q">'+esc(e.addr)+'</div>'+(e.townOnly?'<div class="w">No street address on file, so this is just the town.</div>':'')+'<div class="row">'+btn('bt s','Copy address',function(b){copyText(e.addr,b);})+link('bt','Maps','https://maps.apple.com/?daddr='+encodeURIComponent(e.addr))+'</div>';}
+function extraHtml(x){var e=EXTRA[x.id];if(!e||e.addr!=null)return '';var o='<div class="ex">';
+  if(e.draft)o+='<div class="q">'+esc(e.draft)+'</div><div class="row">'+btn('bt','Copy text',function(b){copyText(e.draft,b);})+(e.is472||!e.phone?link('bt','Thumbtack',TT):'')+'</div>';
+  if(e.phone)o+='<div class="row" style="align-items:center"><span style="flex:1;font-weight:600">Text to '+esc(fmtPhone(e.phone))+'</span>'+btn('sm s','Copy number',function(b){copyText(fmtPhone(e.phone),b);})+'</div>';
   else if(e.is472)o+='<div class="w">472 is a Thumbtack relay number, so reply in Thumbtack.</div>';
   return o+'</div>';}
 function leadCard(x,isNext){var meta=[isNext?x.svc:'',x.town,x.hours!=null?'came in '+since(x.hours):''].filter(Boolean).join(' · ');
   var o='<div class="c'+(isNext?' next':'')+'">'+(isNext?'<div class="lab">Do this next</div>':'')+'<b>'+(isNext?'Answer '+esc(x.first)+(x.is472?' on Thumbtack':''):esc(x.first)+(x.svc?' · '+esc(x.svc):''))+'</b><div class="m">'+esc(meta)+'</div>';
   if(x.is472)o+='<div class="w">472 number: it’s a Thumbtack relay. Reply in Thumbtack, not by text.</div>';
-  if(x.draft){o+='<div class="q">'+esc(x.draft)+'</div><div class="row">'+btn('bt','Copy text',function(){copyText(x.draft);})+(x.is472?link('bt','Open Thumbtack',TT):btn('bt','Show number',function(b){doNumber(x,b);}))+btn('bt s','Sent ✓',function(){doSent(x);})+'</div>';
-    var e=EXTRA[x.id];if(e&&e.phone)o+='<div class="row" style="align-items:center"><span style="flex:1;font-weight:600">Text to '+esc(fmtPhone(e.phone))+'</span>'+btn('sm s','Copy number',function(){copyText(fmtPhone(e.phone));})+'</div>';}
-  else o+='<div class="m" style="margin-top:6px">No draft yet. Head Honcho will add one.</div><div class="row">'+link('bt','Open Thumbtack',TT)+link('bt s','Copilot',COPILOT)+'</div>';
+  if(x.draft){o+='<div class="q">'+esc(x.draft)+'</div><div class="row">'+btn('bt','Copy text',function(b){copyText(x.draft,b);})+(x.is472?link('bt','Thumbtack',TT):btn('bt','Show number',function(b){doNumber(x,b);}))+btn('bt s','Sent ✓',function(){doSent(x);})+'</div>';
+    var e=EXTRA[x.id];if(e&&e.phone)o+='<div class="row" style="align-items:center"><span style="flex:1;font-weight:600">Text to '+esc(fmtPhone(e.phone))+'</span>'+btn('sm s','Copy number',function(b){copyText(fmtPhone(e.phone),b);})+'</div>';}
+  else o+='<div class="m" style="margin-top:6px">No draft yet. Head Honcho will add one.</div><div class="row">'+link('bt','Thumbtack',TT)+link('bt s','Copilot',COPILOT)+'</div>';
   return o+'</div>';}
 function sec(title,n,body){return '<h2>'+esc(title)+(n!=null?'<i>'+n+'</i>':'')+'</h2>'+body;}
 function render(){ACT={};var M=model(),o='',today=ymd(new Date());
@@ -159,19 +164,19 @@ function render(){ACT={};var M=model(),o='',today=ymd(new Date());
   // Do this next
   var nx=null;if(M.leads.length)nx={k:'lead',x:M.leads[0]};else if(tj.length)nx={k:'job',x:tj[0]};else if(M.uninv.length)nx={k:'inv',x:M.uninv[0]};else if(M.drafts.length)nx={k:'draft',x:M.drafts[0]};
   if(nx&&nx.k==='lead')o+=leadCard(nx.x,true);
-  else if(nx&&nx.k==='inv')o+='<div class="c next"><div class="lab">Do this next</div><b>Invoice '+esc(nx.x.first)+'</b><div class="m">'+esc([nx.x.town,nx.x.days!=null?'job was '+nx.x.days+' days ago':''].filter(Boolean).join(' · '))+'</div><div class="row">'+link('bt','Open Copilot',COPILOT)+btn('bt s','Invoiced ✓',function(){doInvoiced(nx.x);})+'</div></div>';
-  else if(nx&&nx.k==='draft')o+='<div class="c next"><div class="lab">Do this next</div><b>Finish '+esc(nx.x.first)+'’s estimate</b><div class="m">'+esc(nx.x.svc||'')+'</div><div class="row">'+link('bt','Open Copilot',COPILOT)+'</div></div>';
+  else if(nx&&nx.k==='inv')o+='<div class="c next"><div class="lab">Do this next</div><b>Invoice '+esc(nx.x.first)+'</b><div class="m">'+esc([nx.x.town,nx.x.days!=null?'job was '+nx.x.days+' days ago':''].filter(Boolean).join(' · '))+'</div><div class="row">'+link('bt','Copilot',COPILOT)+btn('bt s','Invoiced ✓',function(){doInvoiced(nx.x);})+'</div></div>';
+  else if(nx&&nx.k==='draft')o+='<div class="c next"><div class="lab">Do this next</div><b>Finish '+esc(nx.x.first)+'’s estimate</b><div class="m">'+esc(nx.x.svc||'')+'</div><div class="row">'+link('bt','Copilot',COPILOT)+'</div></div>';
   // Leads
   var rest=M.leads.slice(nx&&nx.k==='lead'?1:0);
   if(rest.length)o+=sec('New leads waiting',M.leads.length,rest.map(function(x){return leadCard(x,false);}).join(''));
   // Jobs
   if(M.jobs.length||M.v6){var j=M.jobs[0];
-    o+=sec(tj.length?'Today':'Next job',null,j?'<div class="c"><b>'+esc(j.first)+(j.svc?' · '+esc(j.svc):'')+(j.visit?' (estimate visit)':'')+'</b><div class="m">'+esc([dlabel(j.date),j.start?t12(j.start)+(j.end?'–'+t12(j.end):''):(j.timeTxt||''),j.town,j.approved?'estimate approved':''].filter(Boolean).join(' · '))+'</div><div class="row">'+btn('bt','Navigate',function(b){doNav(j,b);})+link('bt s','Open in Copilot',COPILOT)+'</div>'+
+    o+=sec(tj.length?'Today':'Next job',null,j?'<div class="c"><b>'+esc(j.first)+(j.svc?' · '+esc(j.svc):'')+(j.visit?' (estimate visit)':'')+'</b><div class="m">'+esc([dlabel(j.date),j.start?t12(j.start)+(j.end?'–'+t12(j.end):''):(j.timeTxt||''),j.town,j.approved?'estimate approved':''].filter(Boolean).join(' · '))+'</div><div class="row">'+btn('bt','Address',function(b){doAddr(j,b);})+link('bt s','Copilot',COPILOT)+'</div>'+addrHtml(j)+
       (M.jobs.length>1?'<div class="m" style="margin-top:8px">Then: '+esc(M.jobs.slice(1,4).map(function(y){return y.first+' '+dlabel(y.date);}).join(', '))+'</div>':'<div class="m" style="margin-top:8px">Nothing else booked in the next 2 weeks.</div>')+'</div>':'<div class="c empty">Nothing booked in the next 2 weeks.</div>');}
   // Uninvoiced
-  if(M.uninv.length)o+=sec('Done, not invoiced',M.uninv.length,'<div class="c">'+M.uninv.map(function(x){return '<div class="li"><div class="t"><b>'+esc(x.first)+'</b><div class="m">'+esc([x.svc,x.town,x.inv==='draft'?'invoice drafted':''].filter(Boolean).join(' · '))+'</div></div>'+dayPill(x.days)+link('sm','Invoice',COPILOT)+btn('sm s','✓',function(){doInvoiced(x);})+'</div>';}).join('')+'</div>');
+  if(M.uninv.length)o+=sec('Done, not invoiced',M.uninv.length,'<div class="c">'+M.uninv.map(function(x){return '<div class="li"><div class="t"><b>'+esc(x.first)+'</b><div class="m">'+esc([x.svc,x.town,x.inv==='draft'?'invoice drafted':''].filter(Boolean).join(' · '))+'</div></div>'+dayPill(x.days)+link('sm','Copilot',COPILOT)+btn('sm s','Invoiced ✓',function(){doInvoiced(x);})+'</div>';}).join('')+'</div>');
   // Drafts
-  if(M.drafts.length)o+=sec('Estimates to finish',M.drafts.length,'<div class="c">'+M.drafts.map(function(x){return '<div class="li"><div class="t"><b>'+esc(x.first)+'</b><div class="m">'+esc(x.svc||'')+'</div></div>'+dayPill(x.days)+link('sm','Review',COPILOT)+'</div>';}).join('')+'</div>');
+  if(M.drafts.length)o+=sec('Estimates to finish',M.drafts.length,'<div class="c">'+M.drafts.map(function(x){return '<div class="li"><div class="t"><b>'+esc(x.first)+'</b><div class="m">'+esc(x.svc||'')+'</div></div>'+dayPill(x.days)+link('sm','Copilot',COPILOT)+'</div>';}).join('')+'</div>');
   // Waiting + never booked
   function fl(x,kind){return '<div class="li"><div class="t"><b>'+esc(x.first)+'</b><div class="m">'+esc([x.svc,x.town,x.is472?'472':'' ,x.followed?'nudged':''].filter(Boolean).join(' · '))+'</div></div>'+dayPill(x.days)+
     (x.is472?link('sm','Thumbtack',TT):btn('sm','Nudge',function(b){doNudge(x,kind,b);}))+btn('sm s',x.days>=(kind==='lead'?14:21)?'Close':'Sent ✓',function(){x.days>=(kind==='lead'?14:21)?doLost(x):doSent(x);})+extraHtml(x)+'</div>';}
@@ -179,7 +184,7 @@ function render(){ACT={};var M=model(),o='',today=ymd(new Date());
     return '<div class="c">'+(a.map(function(x){return fl(x,kind);}).join('')||'<div class="empty">Nothing recent.</div>')+(b.length?'<details><summary>'+b.length+' older than '+(lim===14?'2':'3')+' weeks: close out?</summary>'+b.map(function(x){return fl(x,kind);}).join('')+'</details>':'')+'</div>';}
   if(M.waiting.length)o+=sec('Waiting on customer',M.waiting.length,fold(M.waiting,'estimate'));
   if(M.never.length)o+=sec('Never booked',M.never.length,fold(M.never,'lead'));
-  if(S&&!M.v6)o+='<div class="c m">Follow-ups and invoice tracking turn on with the v6 script update.</div>';
+  if(S&&!M.v6)o+='<div class="c m">Copilot isn’t connecting to Mission Control right now, so follow-ups and nudges are hidden. Leads, jobs and invoices below come from your board.</div>';
   $('app').innerHTML=o;}
 
 function stamp(){if(!S)return '';var a=S.copilot&&S.copilot.at?new Date(S.copilot.at):null;var tf=function(d){return d.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});};
@@ -189,8 +194,8 @@ function refresh(){render();if(!conn()){$('pin').style.display='block';return Pr
   if(busy)return Promise.resolve();busy=true;
   var s=function(){return api({action:'state'});};
   return s().catch(function(e){if(/pin/i.test(e.message))throw e;return new Promise(function(r){setTimeout(r,2500);}).then(s);}).then(function(j){if(!j||!j.board)throw new Error('bad state');S=j;try{localStorage.setItem(LK,JSON.stringify(j));}catch(e){}
-      $('st').innerHTML=stamp()+' · <a href="classic/">Classic view</a>';})
-   .catch(function(e){$('st').innerHTML=(S?'Showing your last update · ':'Can’t reach your board right now · ')+'<a href="classic/">Classic view</a>';if(/pin/i.test(e.message))$('pin').style.display='block';})
+      $('st').innerHTML=stamp()+' · <a href="classic/" target="_blank" rel="noopener">Classic view ↗</a>';})
+   .catch(function(e){$('st').innerHTML=(S?'Showing your last update · ':'Can’t reach your board right now · ')+'<a href="classic/" target="_blank" rel="noopener">Classic view ↗</a>';if(/pin/i.test(e.message))$('pin').style.display='block';})
    .then(function(){busy=false;render();});}
 $('pinGo').onclick=function(){var v=$('pinIn').value.trim();if(v.length<4)return;saveConn({url:DEFURL,pin:v});$('pin').style.display='none';refresh();};
 function verCheck(){if(!/^https?:/.test(location.protocol))return;fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
