@@ -149,11 +149,15 @@ var BOTS=[
 
 // ---- Snapshot fallback (first names only, no addresses/phones/money) ----
 var SNAP={board:[
- {row:27,item:'Google reviews: 36 (was 33 before blast; same as Oct 17-18)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
+ {row:27,item:'Google reviews: 36 (was 33 before blast; same as Oct 17-20)',area:'Reviews',owner:'Marketeer',status:'Done',next:'Keep counting daily through Oct 28.',due:'',updated:''},
+ {row:39,item:'Randy Thu job, 8 AM (Setauket)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Service replacement + water-heater hookup, Thu Oct 22 at 8 AM',due:'2026-10-22',updated:''},
  {row:37,item:'Invoice Kathy',area:'Billing',owner:'Rob',status:'Not started',next:'Send invoice for finished job',due:'',updated:''},
  {row:38,item:'Invoice Abhik',area:'Billing',owner:'Rob',status:'Not started',next:'Send invoice for finished job',due:'',updated:''},
  {row:30,item:'Timothy Wed job, 8 AM (East Islip)',area:'Scheduling',owner:'Rob',status:'Not started',next:'Rewiring job Wed Oct 28, 8 AM to 4 PM',due:'2026-10-28',updated:''}
-],approvals:[]};
+],approvals:[
+ {id:'A10',type:'New lead reply',title:'Lou: Fan Installation (East Norwich)',draft:'Lead reply asking for a photo and offering visit times, ready for your OK.',created:'2026-10-19'},
+ {id:'A12',type:'New lead reply',title:'Craig: Lighting Installation (Southampton)',draft:'Lead reply asking for a photo and offering visit times, ready for your OK.',created:'2026-10-20'}
+]};
 var LK='bermanMC.last.v1';try{var LS=JSON.parse(localStorage.getItem(LK));if(LS&&LS.board)SNAP=LS;}catch(e){}
 var S=SNAP, live=false, local={};  // local: optimistic results keyed by card id
 
